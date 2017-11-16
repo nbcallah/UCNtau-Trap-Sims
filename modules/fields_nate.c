@@ -9,19 +9,20 @@ double L = 0.02; //characteristic spacing of magnets
 double mu = -9.6623647e-27;
 double m_n = 1.674927471e-27;
 double grav = 9.80665e0;
-double N = 3.0; //how far out to go in field ripple expansion
+int N = 3; //how far out to go in field ripple expansion
 
 void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, double *fz, double *totalU, double* t) //analytical form of halbach field force, mu*del(mod(B))
 {
-	double A = sqrt(8.0)*B/M_PI; //parameter related to B -- shows up in expansion
+//	double A = sqrt(8.0)*B/M_PI; //parameter related to B -- shows up in expansion
+	double A = 4*B/(M_PI*sqrt(2));
 
-	double n,m;
+//	double n;
 
 	double x = *x_in;
 	double y = *y_in;
 	double z = *z_in;
 
-	double gx=0.0, gy=0.0, gz=0.0, R, r, B_tot;
+	double gx=0.0, gy=0.0, gz=0.0, R, r;
 
 	if (x > 0.0)
 	{
@@ -39,58 +40,69 @@ void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, do
 
 	if (z < -1.0 && r_zeta < r)
 	{
-
-		double rho = sqrt(y*y+z*z);
-		double r_zeta = sqrt((rho-R)*(rho-R)+x*x);
-		double zeta = r-r_zeta;
-		double eta = r*atan(x/(rho-R));
-//		double Bsum = 0.0, B_zeta = 0.0 , B_eta = 0.0;
-		double B_zeta = 0.0 , B_eta = 0.0;
+//		double eta = ;
+//		double zeta = ;
+		double eta = r*atan(x/(sqrt(z*z + y*y) - R));
+		double zeta = r - sqrt((sqrt(z*z + y*y) - R)*(sqrt(z*z + y*y) - R) + x*x);
+		double sum_cos=0.0, sum_sin=0.0, sum_k_cos=0.0, sum_k_sin=0.0;
+		double cos_term=0.0, sin_term=0.0;
 		
 		double k_n;
-		
-		for(n = 1.0; n <= N; n+=1.0) {
+
+		for (int n = 1; n <= N; n += 1)
+		{
 			k_n = 2*M_PI*(4.0*n-3.0)/L;
-			B_zeta += pow(-1.0,n)/(4.0*n-3.0)*(1-exp(-k_n*d))*exp(-(k_n)*zeta)*cos((k_n)*eta);
-			B_eta += pow(-1.0,n)/(4.0*n-3.0)*(1-exp(-k_n*d))*exp(-(k_n)*zeta)*sin((k_n)*eta);
+			
+			cos_term = (n%2 == 0 ? 1 : -1)/(4.0*n-3.0)*(1-exp(-k_n*d))*exp(-k_n*zeta)*cos(k_n*eta);
+			sin_term = (n%2 == 0 ? 1 : -1)/(4.0*n-3.0)*(1-exp(-k_n*d))*exp(-k_n*zeta)*sin(k_n*eta);
+			
+			sum_cos += cos_term;
+			sum_k_cos += k_n*cos_term;
+			sum_sin += sin_term;
+			sum_k_sin += k_n*sin_term;
 		}
 		
-		double Hold = B_h*B_h*(r+R)*(r+R)/rho/rho/rho/rho;
-		B_tot = sqrt(B_h*B_h*(r+R)*(r+R)/rho/rho + A*A*B_zeta*B_zeta + A*A*B_eta*B_eta);
+		double b_zeta = A*sum_cos;
+		double b_eta = A*sum_sin;
+		double b_hold = B_h*(r+R)/(sqrt(y*y + z*z));
+		
+		double b_tot = sqrt(b_zeta*b_zeta + b_eta*b_eta + b_hold*b_hold);
+	
+		//zeta, eta
+		double d_BZeta[2] = {-1*A*sum_k_cos, -1*A*sum_k_sin};
+		double d_BEta[2] = {-1*A*sum_k_sin, A*sum_k_cos};
 
-		gx = 0.5/B_tot*mu*(A*A*(B_zeta*B_zeta)*x/r_zeta - A*A*(B_eta*B_eta)*r*(rho-R)/r_zeta/r_zeta);
-		gy = 0.5/B_tot*mu*(A*A*(B_zeta*B_zeta)*y*(1.0-R/rho)/r_zeta + A*A*(B_eta*B_eta)*x*y*r/rho/r_zeta/r_zeta - 2.0*Hold*y);
-		gz = 0.5/B_tot*mu*(A*A*(B_zeta*B_zeta)*z*(1.0-R/rho)/r_zeta + A*A*(B_eta*B_eta)*r*x*z/rho/r_zeta/r_zeta - 2.0*Hold*z);
-
-//		double k_m,k_n;
-//
-//		for (m = 1.0;m<=N;m+=1.0)
-//		{
-//			k_m = 2*M_PI*(4.0*m-3.0)/L;
-//
-//			for (n = 1.0;n<=N;n+=1.0)
-//			{
-//				k_n = 2*M_PI*(4.0*n-3.0)/L;
-//
-//				B_zeta += pow(-1.0,m)*pow(-1.0,n)/(4.0*m-3.0)/(4.0*n-3.0)*(1-exp(-k_m*d))*(1-exp(-k_n*d))*(k_n+k_m)*exp(-(k_n+k_m)*zeta)*cos((k_n-k_m)*eta);
-//				B_eta += pow(-1.0,m)*pow(-1.0,n)/(4.0*m-3.0)/(4.0*n-3.0)*(1-exp(-k_m*d))*(1-exp(-k_n*d))*(k_n-k_m)*exp(-(k_n+k_m)*zeta)*sin((k_n-k_m)*eta);
-//
-//				Bsum += pow(-1.0,m)*pow(-1.0,n)/(4.0*m-3.0)/(4.0*n-3.0)*(1-exp(-k_m*d))*(1-exp(-k_n*d))*exp(-(k_n+k_m)*zeta)*cos((k_n-k_m)*eta);
-//			}
-//		}
-//
-//		double Hold = B_h*B_h*(r+R)*(r+R)/rho/rho/rho/rho;
-//		B_tot = sqrt(B_h*B_h*(r+R)*(r+R)/rho/rho + A*A*Bsum);
-//
-//		gx = 0.5/B_tot*mu*(A*A*B_zeta*x/r_zeta - A*A*B_eta*r*(rho-R)/r_zeta/r_zeta);
-//		gy = 0.5/B_tot*mu*(A*A*B_zeta*y*(1.0-R/rho)/r_zeta + A*A*B_eta*x*y*r/rho/r_zeta/r_zeta - 2.0*Hold*y);
-//		gz = 0.5/B_tot*mu*(A*A*B_zeta*z*(1.0-R/rho)/r_zeta + B_eta*r*x*z/rho/r_zeta/r_zeta - 2.0*Hold*z);
-
+		//x,y,z
+		double d_Bh[3] = {0.0,
+						  -B_h*(r+R)*y/(pow(y*y + z*z, 3.0/2.0)),
+						  -B_h*(r+R)*z/(pow(y*y + z*z, 3.0/2.0))};
+		double d_Zeta[3] = {-(x/sqrt(x*x + (R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z)))),
+							-y*(sqrt(y*y + z*z) - R)/(sqrt(y*y + z*z)*sqrt(x*x + (R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z)))),
+							-z*(sqrt(y*y + z*z) - R)/(sqrt(y*y + z*z)*sqrt(x*x + (R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z))))};
+		double d_Eta[3] = {r/((sqrt(y*y + z*z) - R)*(1.0 + x*x/(R-sqrt(y*y + z*z))*(R-sqrt(y*y + z*z)))),
+						   -r*x*y/(sqrt(y*y + z*z)*(sqrt(y*y + z*z) - R)*(sqrt(y*y + z*z) - R)*(1.0 + x*x/((sqrt(y*y + z*z) - R)*(sqrt(y*y + z*z) - R)))),
+						   -r*x*z/(sqrt(y*y + z*z)*(sqrt(y*y + z*z) - R)*(sqrt(y*y + z*z) - R)*(1.0 + x*x/((sqrt(y*y + z*z) - R)*(sqrt(y*y + z*z) - R))))};
+		
+		gx = mu*(1.0/b_tot)*(
+			b_zeta*(d_BZeta[0]*d_Zeta[0] + d_BZeta[1]*d_Eta[0])
+			+ b_eta*(d_BEta[0]*d_Zeta[0] + d_BEta[1]*d_Eta[0]));
+		
+		gy = mu*(1.0/b_tot)*(
+			b_zeta*(d_BZeta[0]*d_Zeta[1] + d_BZeta[1]*d_Eta[1])
+			+ b_eta*(d_BEta[0]*d_Zeta[1] + d_BEta[1]*d_Eta[1])
+			+ b_hold*d_Bh[1]);
+		
+		gz = mu*(1.0/b_tot)*(
+			b_zeta*(d_BZeta[0]*d_Zeta[2] + d_BZeta[1]*d_Eta[2])
+			+ b_eta*(d_BEta[0]*d_Zeta[2] + d_BEta[1]*d_Eta[2])
+			+ b_hold*d_Bh[2]);
+		
+		*totalU = -mu*b_tot + grav*m_n*z;
 	}
 
 	gz -= grav*m_n;
 
-	*totalU = -mu*B_tot+grav*m_n*z;
+//	*totalU = -mu*b_tot + grav*m_n*z;
 
 	*fx = gx;
 	*fy = gy;

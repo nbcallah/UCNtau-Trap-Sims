@@ -49,6 +49,7 @@ PROGRAM track
 	b(2)=-.2248198030794208058e0_8
 	b(3)=.7563200005156682911e0_8
 	b(4)=.3340036032863214255e0_8
+!	PRINT *, SUM(a), SUM(b)
 !	a(1)=(1.0_8/6.0_8)&
 !		*(2.0_8+2.0_8**(1.0_8/3.0_8)&
 !			+2.0_8**(-1.0_8/3.0_8))
@@ -65,6 +66,7 @@ PROGRAM track
 	states(1,1,:) = (/x,y,z,0.1_8*MASS_N,0.06542_8*MASS_N,0.0_8/)
 	
 	CALL trackAndPrint(states(1,:,:))
+!	CALL compPots()
 !	CALL calcx0Mesh()
 	
 !	PRINT *, states(1,1,:)

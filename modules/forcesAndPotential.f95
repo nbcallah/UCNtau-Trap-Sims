@@ -33,6 +33,21 @@ SUBROUTINE totalForce(x, y, z, fx, fy, fz, totalU, t)
 
 END SUBROUTINE totalForce
 
+SUBROUTINE totalForceDan(x, y, z, fx, fy, fz, totalU, t)
+	IMPLICIT NONE
+	real(kind=PREC), intent(in) :: x, y, z
+	real(kind=PREC), intent(out) :: fx, fy, fz
+	real(kind=PREC), intent(out) :: totalU
+	real(kind=PREC), optional, intent(in) :: t
+	
+	IF(PRESENT(t)) THEN
+		CALL force_dan(x, y, z, fx, fy, fz, t)
+	ELSE
+		CALL force_dan(x, y, z, fx, fy, fz)
+	END IF
+
+END SUBROUTINE totalForceDan
+
 
 SUBROUTINE calcEnergy(state, energy, t)
 	IMPLICIT NONE
