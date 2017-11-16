@@ -2,8 +2,8 @@ F95=ftn
 FFLAGS=-cpp -O3 -I/N/u/nbcallah/BigRed2/libraries/include/
 VPATH=modules
 MODOBJ=constants.o forcesAndPotential.o symplecticInt.o testSubroutines.o #lyapunov.o trackGeometry.o
-COBJ=modules/fields_fortran_dan.o modules/fields_nate.o
-#COBJ=modules/fields_nate.o
+#COBJ=modules/fields_fortran_dan.o modules/fields_nate.o
+COBJ=modules/fields_nate.o
 LFLAGS=-L/N/u/nbcallah/BigRed2/libraries/lib -lnlopt
 
 #all: symplecticInt trajGen henonHeiles symplecticIntNoPert symplecticIntNoPertEscape #symplecticIntPertEscapeFieldStrength biasedVsqDescent

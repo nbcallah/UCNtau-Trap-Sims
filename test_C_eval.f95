@@ -36,7 +36,7 @@ PROGRAM track
 	CALL GETARG(3, arg)
 	READ(arg,*) z
 	
-	dt = 0.0005
+	dt = 0.00005
 	
 	allocate(states(1,3,6))
 	

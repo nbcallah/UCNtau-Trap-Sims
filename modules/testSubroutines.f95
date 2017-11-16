@@ -40,7 +40,7 @@ SUBROUTINE trackAndPrint(state, sympT)
 !	END DO
 		
 !	numSteps = 250e0_8/dt
-	numSteps = 10e0/dt
+	numSteps = 1000e0/dt
 !	modulus = numSteps/50000
 !	modulus = numSteps/100000
 	t = 0.0_8
@@ -55,9 +55,9 @@ SUBROUTINE trackAndPrint(state, sympT)
 !		IF(1 .EQ. 1) THEN
 !			energy = totalU + SUM(state(1,4:6)**2)/(2.0_8*MASS_N)
 
-!			PRINT *, dt*i, state(1,1), state(1,2), state(1,3),&
-!			state(1,4)/MASS_N, state(1,5)/MASS_N, state(1,6)/MASS_N, energy,&
-!			totalU!, fx, fy, fz
+			PRINT *, dt*i, state(1,1), state(1,2), state(1,3),&
+			state(1,4)/MASS_N, state(1,5)/MASS_N, state(1,6)/MASS_N, energy,&
+			totalU!, fx, fy, fz
 
 			!PRINT *, dt*i, energy
 		END IF
@@ -65,10 +65,10 @@ SUBROUTINE trackAndPrint(state, sympT)
 			CALL symplecticStep(state(1,:), stateRoundErr(1,:), dt, 0.0e0_8, energy, t)
 		ELSE
 			CALL symplecticStep(state(1,:), stateRoundErr(1,:), dt, 0.0e0_8, energy)
-			CALL totalForce(state(1,1), state(1,2), state(1,3), fx_nate, fy_nate, fz_nate, e_nate)
-			CALL totalForceDan(state(1,1), state(1,2), state(1,3), fx_dan, fy_dan, fz_dan, e_dan)
-			PRINT *, t, (fx_nate-fx_dan)/fx_nate, (fy_nate-fy_dan)/fy_nate,&
-			(fz_nate-fz_dan)/fz_nate, (e_nate-e_dan)/e_nate
+!			CALL totalForce(state(1,1), state(1,2), state(1,3), fx_nate, fy_nate, fz_nate, e_nate)
+!			CALL totalForceDan(state(1,1), state(1,2), state(1,3), fx_dan, fy_dan, fz_dan, e_dan)
+!			PRINT *, t, (fx_nate-fx_dan)/fx_nate, (fy_nate-fy_dan)/fy_nate,&
+!			(fz_nate-fz_dan)/fz_nate, (e_nate-e_dan)/e_nate
 			t = t+dt
 		END IF
 	END DO

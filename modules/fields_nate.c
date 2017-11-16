@@ -9,7 +9,7 @@ double L = 0.02; //characteristic spacing of magnets
 double mu = -9.6623647e-27;
 double m_n = 1.674927471e-27;
 double grav = 9.80665e0;
-int N = 3; //how far out to go in field ripple expansion
+int N_terms = 3; //how far out to go in field ripple expansion
 
 void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, double *fz, double *totalU, double* t) //analytical form of halbach field force, mu*del(mod(B))
 {
@@ -42,14 +42,14 @@ void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, do
 	{
 //		double eta = ;
 //		double zeta = ;
-		double eta = r*atan(x/(sqrt(z*z + y*y) - R));
-		double zeta = r - sqrt((sqrt(z*z + y*y) - R)*(sqrt(z*z + y*y) - R) + x*x);
+		double eta = r*atan(x/(sqrt(y*y + z*z) - R));
+		double zeta = r - sqrt(x*x + (sqrt(y*y + z*z) - R)*(sqrt(y*y + z*z) - R));
 		double sum_cos=0.0, sum_sin=0.0, sum_k_cos=0.0, sum_k_sin=0.0;
 		double cos_term=0.0, sin_term=0.0;
 		
 		double k_n;
 
-		for (int n = 1; n <= N; n += 1)
+		for (int n = 1.0; n <= N_terms; n += 1.0)
 		{
 			k_n = 2*M_PI*(4.0*n-3.0)/L;
 			
@@ -64,7 +64,9 @@ void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, do
 		
 		double b_zeta = A*sum_cos;
 		double b_eta = A*sum_sin;
-		double b_hold = B_h*(r+R)/(sqrt(y*y + z*z));
+		double b_hold = B_h*(r+R)
+			                /
+			         (sqrt(y*y + z*z));
 		
 		double b_tot = sqrt(b_zeta*b_zeta + b_eta*b_eta + b_hold*b_hold);
 	
@@ -76,12 +78,39 @@ void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, do
 		double d_Bh[3] = {0.0,
 						  -B_h*(r+R)*y/(pow(y*y + z*z, 3.0/2.0)),
 						  -B_h*(r+R)*z/(pow(y*y + z*z, 3.0/2.0))};
-		double d_Zeta[3] = {-(x/sqrt(x*x + (R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z)))),
-							-y*(sqrt(y*y + z*z) - R)/(sqrt(y*y + z*z)*sqrt(x*x + (R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z)))),
-							-z*(sqrt(y*y + z*z) - R)/(sqrt(y*y + z*z)*sqrt(x*x + (R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z))))};
-		double d_Eta[3] = {r/((sqrt(y*y + z*z) - R)*(1.0 + x*x/(R-sqrt(y*y + z*z))*(R-sqrt(y*y + z*z)))),
-						   -r*x*y/(sqrt(y*y + z*z)*(sqrt(y*y + z*z) - R)*(sqrt(y*y + z*z) - R)*(1.0 + x*x/((sqrt(y*y + z*z) - R)*(sqrt(y*y + z*z) - R)))),
-						   -r*x*z/(sqrt(y*y + z*z)*(sqrt(y*y + z*z) - R)*(sqrt(y*y + z*z) - R)*(1.0 + x*x/((sqrt(y*y + z*z) - R)*(sqrt(y*y + z*z) - R))))};
+		double d_Zeta[3] = {-(x
+							  /
+							  sqrt(
+								  x*x + ((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z)))
+							  )
+							 ),
+							-y*(sqrt(y*y + z*z) - R)
+								/(
+								  sqrt(y*y + z*z)
+								  *sqrt(x*x + ((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z))))
+							     ),
+							-z*(sqrt(y*y + z*z) - R)
+								/(
+								  sqrt(y*y + z*z)
+								  *sqrt(x*x + ((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z))))
+							     )};
+		double d_Eta[3] = {r
+			               /(
+			                 (sqrt(y*y + z*z) - R)
+			                 *(1.0 + x*x/((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z))))
+		                    ),
+						   -r*x*y
+							/(
+							   sqrt(y*y + z*z)
+							   *((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z)))
+							   *(1.0 + x*x/((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z))))
+						     ),
+						   -r*x*z
+							/(
+							   sqrt(y*y + z*z)
+							   *((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z)))
+							   *(1.0 + x*x/((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z))))
+						     )};
 		
 		gx = mu*(1.0/b_tot)*(
 			b_zeta*(d_BZeta[0]*d_Zeta[0] + d_BZeta[1]*d_Eta[0])
@@ -141,10 +170,10 @@ void fieldstrength_(double *x_in, double *y_in, double *z_in, double *totalB, do
 		double Bsum = 0.0;
 		double k_m,k_n,m,n;
 
-		for (m = 1.0;m<=N;m+=1.0)
+		for (m = 1.0;m<=3.0;m+=1.0)
 		{
 			k_m = 2*M_PI*(4.0*m-3.0)/L;
-			for (n = 1.0;n<=N;n+=1.0)
+			for (n = 1.0;n<=3.0;n+=1.0)
 			{
 				k_n = 2*M_PI*(4.0*n-3.0)/L;
 
@@ -191,10 +220,10 @@ void potential_(double *x_in, double *y_in, double *z_in, double *totalU, double
 		double Bsum = 0.0;
 		double k_m,k_n,m,n;
 
-		for (m = 1.0;m<=N;m+=1.0)
+		for (m = 1.0;m<=3.0;m+=1.0)
 		{
 			k_m = 2*M_PI*(4.0*m-3.0)/L;
-			for (n = 1.0;n<=N;n+=1.0)
+			for (n = 1.0;n<=3.0;n+=1.0)
 			{
 				k_n = 2*M_PI*(4.0*n-3.0)/L;
 
