@@ -45,6 +45,10 @@ SUBROUTINE trackEnergyGain(state, energy_start, energy_end, sympT)
 			CALL symplecticStep(state, dt, energy_end)
 			t = t+dt
 		END IF
+		IF (100.0_8*energy_end/(MASS_N*GRAV) > 38.0_8 + 5.0_8) THEN
+			PRINT *, "DEAD"
+			EXIT
+		END IF
 	END DO
 !	PRINT *, energy_start, energy_end
 END SUBROUTINE trackEnergyGain

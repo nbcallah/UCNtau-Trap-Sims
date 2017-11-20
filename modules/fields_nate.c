@@ -12,7 +12,10 @@
 #define GRAV 9.80665e0
 #define N_TERMS 3 //how far out to go in field ripple expansion
 #define FREQ 60
-#define AMPLITUDE 0.000016
+//#define FREQ 1000
+//#define AMPLITUDE 0.000010
+#define AMPLITUDE 0.000005
+//#define AMPLITUDE 0.000001
 //#define AMPLITUDE 0.0
 
 void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, double *fz, double *totalU, double* t) //analytical form of halbach field force, mu*del(mod(B))
@@ -23,20 +26,20 @@ void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, do
 
 	double x = *x_in;
 	double y = *y_in;
-	double z = *z_in + AMPLITUDE * sin(2*M_PI*FREQ * (*t));
+	double z = *z_in;
 	double z_grav = *z_in;
 
 	double gx=0.0, gy=0.0, gz=0.0, R, r;
 
 	if (x > 0.0)
 	{
-		R = 1.0;
-		r = 0.5;
+		R = 1.0 + AMPLITUDE * sin(2*M_PI*FREQ * (*t));
+		r = 0.5 + AMPLITUDE * sin(2*M_PI*FREQ * (*t));
 	}
 	else
 	{
-		R = 0.5;
-		r = 1.0;
+		R = 0.5 + AMPLITUDE * sin(2*M_PI*FREQ * (*t));
+		r = 1.0 + AMPLITUDE * sin(2*M_PI*FREQ * (*t));
 	}
 
 	double rho = sqrt(y*y+z*z);
@@ -229,7 +232,7 @@ void potential_(double *x_in, double *y_in, double *z_in, double *totalU, double
 	double rho = sqrt(y*y+z*z);
 	double r_zeta = sqrt((rho-R)*(rho-R)+x*x);
 
-	if (z < -0.75 && r_zeta < r)
+	if (z < -1.0 && r_zeta < r)
 	{
 		double eta = r*atan(x/(sqrt(y*y + z*z) - R));
 		double zeta = r - sqrt(x*x + (sqrt(y*y + z*z) - R)*(sqrt(y*y + z*z) - R));
