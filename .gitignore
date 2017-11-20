@@ -6,3 +6,5 @@ test_C_eval
 test_ucntau_fields
 *.dSYM*
 *.nb
+*.tar.gz
+*.ipynb

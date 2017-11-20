@@ -19,6 +19,37 @@ SUBROUTINE compPots()
 	END DO
 END SUBROUTINE compPots
 
+SUBROUTINE trackEnergyGain(state, sympT)
+	USE symplecticInt
+	USE constants
+	USE forcesAndPotential
+	IMPLICIT NONE
+	real(kind=PREC), dimension(3,6), intent(inout) :: state
+	real(kind=PREC), optional, intent(in) :: sympT
+	real(kind=PREC), dimension(3,6) :: stateRoundErr
+	
+	real(kind=PREC) :: t, energy_start, energy_end
+	integer :: i, numSteps, numPoints, modulus
+
+	numSteps = 1000e0/dt
+	t = 0.0_8
+	stateRoundErr = 0.0_8
+!	totalU = 0.0_8
+	
+	CALL calcEnergy(state(1,:), energy_start)
+!	energy = 0.0
+	
+	DO i=1,numSteps,1
+		IF(present(sympT)) THEN
+			CALL symplecticStep(state(1,:), stateRoundErr(1,:), dt, 0.0e0_8, energy_end, t)
+		ELSE
+			CALL symplecticStep(state(1,:), stateRoundErr(1,:), dt, 0.0e0_8, energy_end)
+			t = t+dt
+		END IF
+	END DO
+	PRINT *, energy_start, energy_end
+END SUBROUTINE trackEnergyGain
+
 SUBROUTINE trackAndPrint(state, sympT)
 	USE symplecticInt
 	USE constants

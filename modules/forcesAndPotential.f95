@@ -1,6 +1,7 @@
 #include "constants.h"
 
 MODULE forcesAndPotential
+	real(kind=PREC) :: minU
 
 CONTAINS
 
@@ -15,8 +16,8 @@ SUBROUTINE totalPotential(x, y, z, totalU, t)
 	ELSE
 		CALL potential(x, y, z, totalU)
 	END IF
+	totalU = totalU - minU
 END SUBROUTINE totalPotential
-
 
 SUBROUTINE totalForce(x, y, z, fx, fy, fz, totalU, t)
 	IMPLICIT NONE
@@ -26,11 +27,11 @@ SUBROUTINE totalForce(x, y, z, fx, fy, fz, totalU, t)
 	real(kind=PREC), optional, intent(in) :: t
 	
 	IF(PRESENT(t)) THEN
-		CALL force(x, y, z, fx, fy, fz, t)
+		CALL force(x, y, z, fx, fy, fz, totalU, t)
 	ELSE
-		CALL force(x, y, z, fx, fy, fz)
+		CALL force(x, y, z, fx, fy, fz, totalU)
 	END IF
-
+	totalU = totalU - minU
 END SUBROUTINE totalForce
 
 !SUBROUTINE totalForceDan(x, y, z, fx, fy, fz, totalU, t)

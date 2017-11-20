@@ -1,26 +1,30 @@
 #include "../include/fields_fortran.h"
 #include <math.h>
+#include <stdio.h>
 
-double B_h = 0.005; //holding field strength
-double B = 1.4; //remnant magnet field strength
-double d = 0.0254; //thickness of layer of PM array
-double L = 0.02; //characteristic spacing of magnets
-//double mu = -9.662364e-27/1.674927351e-27; //mu in units where m=1
-double mu = -9.6623647e-27;
-double m_n = 1.674927471e-27;
-double grav = 9.80665e0;
-int N_terms = 3; //how far out to go in field ripple expansion
+#define B_HOLD 0.005 //holding field strength
+#define B_REM 1.4 //remnant magnet field strength
+#define MAG_THICK 0.0254 //thickness of layer of PM array
+#define MAG_SPACE 0.02 //characteristic spacing of magnets
+//#define mu -9.662364e-27/1.674927351e-27 //mu in units where m=1
+#define MU_N -9.6623647e-27
+#define MASS_N 1.674927471e-27
+#define GRAV 9.80665e0
+#define N_TERMS 3 //how far out to go in field ripple expansion
+#define FREQ 60
+#define AMPLITUDE 0.000016
+//#define AMPLITUDE 0.0
 
 void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, double *fz, double *totalU, double* t) //analytical form of halbach field force, mu*del(mod(B))
 {
-//	double A = sqrt(8.0)*B/M_PI; //parameter related to B -- shows up in expansion
-	double A = 4*B/(M_PI*sqrt(2));
-
-//	double n;
+//	printf("%e\n", *x_in);
+//	printf("%p\n", totalU);
+	double A = 4*B_REM/(M_PI*sqrt(2));
 
 	double x = *x_in;
 	double y = *y_in;
-	double z = *z_in;
+	double z = *z_in + AMPLITUDE * sin(2*M_PI*FREQ * (*t));
+	double z_grav = *z_in;
 
 	double gx=0.0, gy=0.0, gz=0.0, R, r;
 
@@ -40,8 +44,6 @@ void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, do
 
 	if (z < -1.0 && r_zeta < r)
 	{
-//		double eta = ;
-//		double zeta = ;
 		double eta = r*atan(x/(sqrt(y*y + z*z) - R));
 		double zeta = r - sqrt(x*x + (sqrt(y*y + z*z) - R)*(sqrt(y*y + z*z) - R));
 		double sum_cos=0.0, sum_sin=0.0, sum_k_cos=0.0, sum_k_sin=0.0;
@@ -49,12 +51,12 @@ void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, do
 		
 		double k_n;
 
-		for (int n = 1.0; n <= N_terms; n += 1.0)
+		for (int n = 1; n <= N_TERMS; n += 1)
 		{
-			k_n = 2*M_PI*(4.0*n-3.0)/L;
+			k_n = 2*M_PI*(4.0*n-3.0)/MAG_SPACE;
 			
-			cos_term = (n%2 == 0 ? 1 : -1)/(4.0*n-3.0)*(1-exp(-k_n*d))*exp(-k_n*zeta)*cos(k_n*eta);
-			sin_term = (n%2 == 0 ? 1 : -1)/(4.0*n-3.0)*(1-exp(-k_n*d))*exp(-k_n*zeta)*sin(k_n*eta);
+			cos_term = (n%2 == 0 ? 1 : -1)/(4.0*n-3.0)*(1-exp(-k_n*MAG_THICK))*exp(-k_n*zeta)*cos(k_n*eta);
+			sin_term = (n%2 == 0 ? 1 : -1)/(4.0*n-3.0)*(1-exp(-k_n*MAG_THICK))*exp(-k_n*zeta)*sin(k_n*eta);
 			
 			sum_cos += cos_term;
 			sum_k_cos += k_n*cos_term;
@@ -64,7 +66,7 @@ void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, do
 		
 		double b_zeta = A*sum_cos;
 		double b_eta = A*sum_sin;
-		double b_hold = B_h*(r+R)
+		double b_hold = B_HOLD*(r+R)
 			                /
 			         (sqrt(y*y + z*z));
 		
@@ -76,8 +78,8 @@ void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, do
 
 		//x,y,z
 		double d_Bh[3] = {0.0,
-						  -B_h*(r+R)*y/(pow(y*y + z*z, 3.0/2.0)),
-						  -B_h*(r+R)*z/(pow(y*y + z*z, 3.0/2.0))};
+						  -B_HOLD*(r+R)*y/(pow(y*y + z*z, 3.0/2.0)),
+						  -B_HOLD*(r+R)*z/(pow(y*y + z*z, 3.0/2.0))};
 		double d_Zeta[3] = {-(x
 							  /
 							  sqrt(
@@ -112,41 +114,46 @@ void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, do
 							   *(1.0 + x*x/((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z))))
 						     )};
 		
-		gx = mu*(1.0/b_tot)*(
+		gx = MU_N*(1.0/b_tot)*(
 			b_zeta*(d_BZeta[0]*d_Zeta[0] + d_BZeta[1]*d_Eta[0])
 			+ b_eta*(d_BEta[0]*d_Zeta[0] + d_BEta[1]*d_Eta[0]));
 		
-		gy = mu*(1.0/b_tot)*(
+		gy = MU_N*(1.0/b_tot)*(
 			b_zeta*(d_BZeta[0]*d_Zeta[1] + d_BZeta[1]*d_Eta[1])
 			+ b_eta*(d_BEta[0]*d_Zeta[1] + d_BEta[1]*d_Eta[1])
 			+ b_hold*d_Bh[1]);
 		
-		gz = mu*(1.0/b_tot)*(
+		gz = MU_N*(1.0/b_tot)*(
 			b_zeta*(d_BZeta[0]*d_Zeta[2] + d_BZeta[1]*d_Eta[2])
 			+ b_eta*(d_BEta[0]*d_Zeta[2] + d_BEta[1]*d_Eta[2])
 			+ b_hold*d_Bh[2]);
 		
-		*totalU = -mu*b_tot + grav*m_n*z;
+		*totalU = -MU_N*b_tot + GRAV*MASS_N*z_grav;
+		
+		gz -= GRAV*MASS_N;
 	}
-
-	gz -= grav*m_n;
-
-//	*totalU = -mu*b_tot + grav*m_n*z;
+	
+	else {
+		gx = NAN;
+		gy = NAN;
+		gz = NAN;
+		*totalU = NAN;
+	}
 
 	*fx = gx;
 	*fy = gy;
 	*fz = gz;
 }
 
-void fieldstrength_(double *x_in, double *y_in, double *z_in, double *totalB, double* t) //-mu*mod(B)
+void fieldstrength_(double *x_in, double *y_in, double *z_in, double *totalB, double* t)
 {
-	double A = sqrt(8.0)*B/M_PI; //parameter related to B -- shows up in expansion
+	double A = 4*B_REM/(M_PI*sqrt(2));
 
 	double x = *x_in;
 	double y = *y_in;
 	double z = *z_in;
 
-	double R,r;
+	double R, r;
 
 	if (x > 0.0)
 	{
@@ -161,42 +168,52 @@ void fieldstrength_(double *x_in, double *y_in, double *z_in, double *totalB, do
 
 	double rho = sqrt(y*y+z*z);
 	double r_zeta = sqrt((rho-R)*(rho-R)+x*x);
-	double B_tot = 0.0;
 
 	if (z < -1.0 && r_zeta < r)
 	{
-		double zeta = r-r_zeta;
-		double eta = r*atan(x/(rho-R));
-		double Bsum = 0.0;
-		double k_m,k_n,m,n;
+		double eta = r*atan(x/(sqrt(y*y + z*z) - R));
+		double zeta = r - sqrt(x*x + (sqrt(y*y + z*z) - R)*(sqrt(y*y + z*z) - R));
+		double sum_cos=0.0, sum_sin=0.0;
+		double cos_term=0.0, sin_term=0.0;
+		
+		double k_n;
 
-		for (m = 1.0;m<=3.0;m+=1.0)
+		for (int n = 1; n <= N_TERMS; n += 1)
 		{
-			k_m = 2*M_PI*(4.0*m-3.0)/L;
-			for (n = 1.0;n<=3.0;n+=1.0)
-			{
-				k_n = 2*M_PI*(4.0*n-3.0)/L;
-
-				Bsum += pow(-1.0,m)*pow(-1.0,n)/(4.0*m-3.0)/(4.0*n-3.0)*(1-exp(-k_m*d))*(1-exp(-k_n*d))*exp(-(k_n+k_m)*zeta)*cos((k_n-k_m)*eta);
-			}
+			k_n = 2*M_PI*(4.0*n-3.0)/MAG_SPACE;
+			
+			cos_term = (n%2 == 0 ? 1 : -1)/(4.0*n-3.0)*(1-exp(-k_n*MAG_THICK))*exp(-k_n*zeta)*cos(k_n*eta);
+			sin_term = (n%2 == 0 ? 1 : -1)/(4.0*n-3.0)*(1-exp(-k_n*MAG_THICK))*exp(-k_n*zeta)*sin(k_n*eta);
+			
+			sum_cos += cos_term;
+			sum_sin += sin_term;
 		}
-
-		B_tot = sqrt(B_h*B_h*(r+R)*(r+R)/(y*y+z*z)+A*A*Bsum);
-
+		
+		double b_zeta = A*sum_cos;
+		double b_eta = A*sum_sin;
+		double b_hold = B_HOLD*(r+R)
+			                /
+			         (sqrt(y*y + z*z));
+		
+		double b_tot = sqrt(b_zeta*b_zeta + b_eta*b_eta + b_hold*b_hold);
+		
+		*totalB = b_tot;
 	}
-
-	*totalB = B_tot;
+	
+	else {
+		*totalB = NAN;
+	}
 }
 
 void potential_(double *x_in, double *y_in, double *z_in, double *totalU, double* t) //-mu*mod(B) + g*z. remember that mu is already negative.
 {
-	double A = sqrt(8.0)*B/M_PI; //parameter related to B -- shows up in expansion (see Walsrom, et al).
+	double A = 4*B_REM/(M_PI*sqrt(2));
 
 	double x = *x_in;
 	double y = *y_in;
 	double z = *z_in;
 
-	double R,r;
+	double R, r;
 
 	if (x > 0.0)
 	{
@@ -211,29 +228,39 @@ void potential_(double *x_in, double *y_in, double *z_in, double *totalU, double
 
 	double rho = sqrt(y*y+z*z);
 	double r_zeta = sqrt((rho-R)*(rho-R)+x*x);
-	double B_tot = 0.0;
 
 	if (z < -1.0 && r_zeta < r)
 	{
-		double zeta = r-r_zeta;
-		double eta = r*atan(x/(rho-R));
-		double Bsum = 0.0;
-		double k_m,k_n,m,n;
+		double eta = r*atan(x/(sqrt(y*y + z*z) - R));
+		double zeta = r - sqrt(x*x + (sqrt(y*y + z*z) - R)*(sqrt(y*y + z*z) - R));
+		double sum_cos=0.0, sum_sin=0.0;
+		double cos_term=0.0, sin_term=0.0;
+		
+		double k_n;
 
-		for (m = 1.0;m<=3.0;m+=1.0)
+		for (int n = 1; n <= N_TERMS; n += 1)
 		{
-			k_m = 2*M_PI*(4.0*m-3.0)/L;
-			for (n = 1.0;n<=3.0;n+=1.0)
-			{
-				k_n = 2*M_PI*(4.0*n-3.0)/L;
-
-				Bsum += pow(-1.0,m)*pow(-1.0,n)/(4.0*m-3.0)/(4.0*n-3.0)*(1-exp(-k_m*d))*(1-exp(-k_n*d))*exp(-(k_n+k_m)*zeta)*cos((k_n-k_m)*eta);
-			}
+			k_n = 2*M_PI*(4.0*n-3.0)/MAG_SPACE;
+			
+			cos_term = (n%2 == 0 ? 1 : -1)/(4.0*n-3.0)*(1-exp(-k_n*MAG_THICK))*exp(-k_n*zeta)*cos(k_n*eta);
+			sin_term = (n%2 == 0 ? 1 : -1)/(4.0*n-3.0)*(1-exp(-k_n*MAG_THICK))*exp(-k_n*zeta)*sin(k_n*eta);
+			
+			sum_cos += cos_term;
+			sum_sin += sin_term;
 		}
-
-		B_tot = sqrt(B_h*B_h*(r+R)*(r+R)/(y*y+z*z)+A*A*Bsum);
-
+		
+		double b_zeta = A*sum_cos;
+		double b_eta = A*sum_sin;
+		double b_hold = B_HOLD*(r+R)
+			                /
+			         (sqrt(y*y + z*z));
+		
+		double b_tot = sqrt(b_zeta*b_zeta + b_eta*b_eta + b_hold*b_hold);
+		
+		*totalU = -MU_N*b_tot + GRAV*MASS_N*z;
 	}
-
-	*totalU = -mu*B_tot+grav*m_n*z;
+	
+	else {
+		*totalU = NAN;
+	}
 }
