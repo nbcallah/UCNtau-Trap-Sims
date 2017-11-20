@@ -1,4 +1,4 @@
-#include "../include/fields_fortran.h"
+#include "../include/fields_nate.h"
 #include <math.h>
 #include <stdio.h>
 

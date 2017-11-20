@@ -28,7 +28,7 @@ all: test_C_eval
 test_C_eval: $(MODOBJ) test_C_eval.o modules/fields_nate.o
 	$(F95) $(MODOBJ) $(COBJ) test_C_eval.o -o test_C_eval $(LFLAGS)
 
-modules/fields_nate.o: modules/fields_nate.c include/fields_fortran.h
+modules/fields_nate.o: modules/fields_nate.c include/fields_nate.h
 	gcc -O3 -c modules/fields_nate.c
 
 %.o:%.f95 modules/constants.h
@@ -37,4 +37,4 @@ modules/fields_nate.o: modules/fields_nate.c include/fields_fortran.h
 clean:
 	find . -type f -name '*.o' -delete
 	find . -type f -name '*.mod' -delete
-	rm symplecticInt
+	rm test_C_eval
