@@ -1,21 +1,7 @@
 #include "modules/constants.h"
 
-!SUBROUTINE totalForce(x, y, z, fx, fy, fz, loops)
-!	!Calculate force from B-field and add in gravity
-!	IMPLICIT NONE
-!	real(kind=PREC), intent(in) :: x, y, z
-!	real(kind=PREC), intent(out) :: fx, fy, fz
-!	real(kind=PREC), dimension(3,NWIRES+1), intent(in) :: loops
-!	real(kind=PREC) :: k
-!	
-!	k=MASS_N
-!	fy=0
-!	fz=0
-!	fx=-k*x
-!END SUBROUTINE totalForce
-
 PROGRAM track
-!	USE mpi
+	USE mpi
 	USE constants
 	USE testSubroutines
 	USE forcesAndPotential
@@ -23,33 +9,37 @@ PROGRAM track
 
 	IMPLICIT NONE
 	real(kind=PREC) :: x, y, z, fx, fy, fz, totalU, energy
-	real(kind=PREC), allocatable :: states(:,:,:)
+	real(kind=PREC) :: energy_start, energy_end
+	real(kind=PREC), allocatable :: states(:,:)
 	character(len=64) :: arg
 	integer :: i
 	integer :: seedLen
 	integer, dimension(32) :: rngSeed
+	integer :: rank, size, tag, next, from, ierr, workerIt, trajPerWorker
+	integer :: ntraj
 
+	CALL MPI_INIT(ierr)
+	CALL MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierr)
+	CALL MPI_COMM_SIZE(MPI_COMM_WORLD, size, ierr)
 	
-	IF (IARGC() .NE. 3) THEN
+	IF (IARGC() .NE. 2) THEN
 		PRINT *, "Error! Not enough or too many arguments!"
-		PRINT *, "x y z"
+		PRINT *, "timestep n_traj"
+		CALL MPI_FINALIZE(ierr)
 		CALL EXIT(0)
 	END IF
 	
 	CALL GETARG(1, arg)
-	READ(arg,*) x
+	READ(arg,*) dt
 	CALL GETARG(2, arg)
-	READ(arg,*) y
-	CALL GETARG(3, arg)
-	READ(arg,*) z
+	READ(arg,*) ntraj
 	
-!	dt = 0.000025_8
-	dt = 0.0005_8
+	trajPerWorker = ntraj/size
 	
 	minU = -2.4283243003838247e-26_8
 	
-	allocate(states(1,3,6))
-	
+	allocate(states(ntraj,6))
+		
 	PI=4.0e0_8*ATAN(1.0e0_8)
 	a(1)=.5153528374311229364e0_8
 	a(2)=-.085782019412973646e0_8
@@ -85,33 +75,21 @@ PROGRAM track
 	END DO
 	CALL RANDOM_SEED(put=rngSeed(1:seedLen))	
 	
-	DO i=1,10000,1
-		CALL randomPointTrap(states(1,1,1), states(1,1,2), states(1,1,3), states(1,1,4), states(1,1,5), states(1,1,6))
-!		CALL trackEnergyGain(states(1,:,:), 0.0_8)
-		CALL calcEnergy(states(1,1,:), energy)
-		PRINT *, states(1,1,1), states(1,1,2), states(1,1,3),&
-			states(1,1,4), states(1,1,5), states(1,1,6), energy/(GRAV*MASS_N)
+	DO i=1,ntraj,1
+		CALL randomPointTrap(states(i,1), states(i,2), states(i,3), states(i,4), states(i,5), states(i,6))
+	END DO
+	
+	DO i=trajPerWorker*rank+1,trajPerWorker*(rank+1),1
+		CALL trackEnergyGain(states(i,:), energy_start, energy_end, 0.0_8)
+		PRINT *, rank, i, energy_start, energy_end
+!		CALL calcEnergy(states(i,:), energy)
+!		PRINT *, rank, states(i,1), states(i,2), states(i,3),&
+!			states(i,4), states(i,5), states(i,6), energy/(GRAV*MASS_N)
 	END DO
 	
 	
-	
-!	states(1,1,:) = (/x,y,z,0.1_8*MASS_N,0.06542_8*MASS_N,0.0_8/)
+	CALL MPI_FINALIZE(ierr)
 	
 !	CALL trackAndPrint(states(1,:,:), 0.0_8)
-	
-	
-	
-	
-!	CALL compPots()
-!	CALL calcx0Mesh()
-	
-!	PRINT *, states(1,1,:)
-	
-!	CALL force(x, y, z, fx, fy, fz, totalU)
-!	CALL force(states(1,1,1), states(1,1,2), states(1,1,3), fx, fy, fz, totalU)
-!	PRINT *, x, y, z, fx, fy, fz, totalU
-!	CALL potential(x, y, z, totalU)
-!	CALL potential(states(1,1,1), states(1,1,2), states(1,1,3), totalU)
-!	PRINT *, x, y, z, 0.0, 0.0, 0.0, totalU
 	
 END PROGRAM track

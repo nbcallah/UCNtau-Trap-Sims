@@ -229,7 +229,7 @@ void potential_(double *x_in, double *y_in, double *z_in, double *totalU, double
 	double rho = sqrt(y*y+z*z);
 	double r_zeta = sqrt((rho-R)*(rho-R)+x*x);
 
-	if (z < -1.0 && r_zeta < r)
+	if (z < -0.75 && r_zeta < r)
 	{
 		double eta = r*atan(x/(sqrt(y*y + z*z) - R));
 		double zeta = r - sqrt(x*x + (sqrt(y*y + z*z) - R)*(sqrt(y*y + z*z) - R));
