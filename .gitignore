@@ -8,3 +8,4 @@ test_ucntau_fields
 *.nb
 *.tar.gz
 *.ipynb
+*.DS_Store

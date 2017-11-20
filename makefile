@@ -3,7 +3,7 @@ FFLAGS=-cpp -O3 -I/N/u/nbcallah/BigRed2/libraries/include/
 VPATH=modules
 MODOBJ=constants.o forcesAndPotential.o symplecticInt.o testSubroutines.o trackGeometry.o
 #COBJ=modules/fields_fortran_dan.o modules/fields_nate.o
-COBJ=modules/fields_nate.o
+COBJ=fields_nate.o
 LFLAGS=-L/N/u/nbcallah/BigRed2/libraries/lib -lnlopt
 
 #all: symplecticInt trajGen henonHeiles symplecticIntNoPert symplecticIntNoPertEscape #symplecticIntPertEscapeFieldStrength biasedVsqDescent
@@ -25,8 +25,11 @@ LFLAGS=-L/N/u/nbcallah/BigRed2/libraries/lib -lnlopt
 
 all: test_C_eval
 
-test_C_eval: $(MODOBJ) test_C_eval.o
+test_C_eval: $(MODOBJ) test_C_eval.o modules/fields_nate.o
 	$(F95) $(MODOBJ) $(COBJ) test_C_eval.o -o test_C_eval $(LFLAGS)
+
+modules/fields_nate.o: modules/fields_nate.c include/fields_fortran.h
+	gcc -O3 -c modules/fields_nate.c
 
 %.o:%.f95 modules/constants.h
 	$(F95) $(FFLAGS) -c $< -o $@
