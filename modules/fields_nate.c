@@ -13,8 +13,8 @@
 #define N_TERMS 3 //how far out to go in field ripple expansion
 #define FREQ 60
 //#define FREQ 1000
-//#define AMPLITUDE 0.000010
-#define AMPLITUDE 0.000005
+#define AMPLITUDE 0.000010
+//#define AMPLITUDE 0.000005
 //#define AMPLITUDE 0.000001
 //#define AMPLITUDE 0.0
 
@@ -34,12 +34,16 @@ void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, do
 	if (x > 0.0)
 	{
 		R = 1.0 + AMPLITUDE * sin(2*M_PI*FREQ * (*t));
+//		R = 1.0 + AMPLITUDE;
 		r = 0.5 + AMPLITUDE * sin(2*M_PI*FREQ * (*t));
+//		r = 0.5;
 	}
 	else
 	{
 		R = 0.5 + AMPLITUDE * sin(2*M_PI*FREQ * (*t));
+//		R = 0.5 + AMPLITUDE;
 		r = 1.0 + AMPLITUDE * sin(2*M_PI*FREQ * (*t));
+//		r = 1.0;
 	}
 
 	double rho = sqrt(y*y+z*z);

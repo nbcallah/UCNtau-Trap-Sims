@@ -79,13 +79,15 @@ PROGRAM track
 		CALL randomPointTrap(states(i,1), states(i,2), states(i,3), states(i,4), states(i,5), states(i,6))
 	END DO
 	
-	DO i=trajPerWorker*rank+1,trajPerWorker*(rank+1),1
-		CALL trackEnergyGain(states(i,:), energy_start, energy_end, 0.0_8)
-		PRINT *, rank, i, energy_start, energy_end
-!		CALL calcEnergy(states(i,:), energy)
-!		PRINT *, rank, states(i,1), states(i,2), states(i,3),&
-!			states(i,4), states(i,5), states(i,6), energy/(GRAV*MASS_N)
-	END DO
+!	DO i=trajPerWorker*rank+1,trajPerWorker*(rank+1),1
+!		CALL trackEnergyGain(states(i,:), energy_start, energy_end, 0.0_8)
+!		PRINT *, rank, i, energy_start, energy_end
+!!		CALL calcEnergy(states(i,:), energy)
+!!		PRINT *, rank, states(i,1), states(i,2), states(i,3),&
+!!			states(i,4), states(i,5), states(i,6), energy/(GRAV*MASS_N)
+!	END DO
+
+	CALL trackAndPrint(states(6, :), 0.0_8)
 	
 	
 	CALL MPI_FINALIZE(ierr)

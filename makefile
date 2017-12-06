@@ -23,10 +23,16 @@ LFLAGS=-L/N/u/nbcallah/BigRed2/libraries/lib -lnlopt
 #trajGen: $(MODOBJ) symplecticTrajectory.o
 #	$(F95) $(MODOBJ) symplecticTrajectory.o -o trajGen $(LFLAGS)
 
-all: test_C_eval
+all: test_C_eval test_ucntau_fields
 
 test_C_eval: $(MODOBJ) test_C_eval.o modules/fields_nate.o
 	$(F95) $(MODOBJ) $(COBJ) test_C_eval.o -o test_C_eval $(LFLAGS)
+	
+test_ucntau_fields: test_ucntau_fields.o modules/fields_nate.o
+	gcc -O3 $(COBJ) test_ucntau_fields.o -o test_ucntau_fields $(LFLAGS)
+
+test_ucntau_fields.o: test_ucntau_fields.c
+	gcc -O3 -c test_ucntau_fields.c -o test_ucntau_fields.o
 
 modules/fields_nate.o: modules/fields_nate.c include/fields_nate.h
 	gcc -O3 -c modules/fields_nate.c
