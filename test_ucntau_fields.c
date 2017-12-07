@@ -14,11 +14,11 @@ int main(int argc, char** argv) {
 	freq = 60.0;
 
 	for(int i = 1; i < 100; i++) {
-//		z = -1.5 + i * (.05/100.0);
-		z = -1.465 + i * (.001/100.0);
+		z = -1.5 + i * (.05/100.0);
+//		z = -1.465 + i * (.001/100.0);
 		force_(&x, &y, &z, &fx, &fy, &fz, &u, &t, &freq);
-//		printf("%f, %e\n", z, (u + 2.4283243003838247e-26)/(GRAV*MASS_N)*100);
-		printf("%f, %.15e\n", z, u);
+		printf("%f, %e\n", z, (u + -2.390245661413933e-26)/(GRAV*MASS_N)*100);
+//		printf("%f, %.15e\n", z, u);
 	}
 	
 	return(0);
