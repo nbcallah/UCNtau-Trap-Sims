@@ -8,8 +8,9 @@ PROGRAM track
 	USE trackGeometry
 
 	IMPLICIT NONE
-	real(kind=PREC) :: x, y, z, fx, fy, fz, totalU, energy
-	real(kind=PREC) :: energy_start, energy_end
+	real(kind=PREC) :: x, y, z, fx, fy, fz, totalU, energy, sympT
+	real(kind=PREC) :: energy_start, energy_end, eGain
+	real(kind=PREC) :: freq, height
 	real(kind=PREC), allocatable :: states(:,:)
 	character(len=64) :: arg
 	integer :: i
@@ -36,7 +37,8 @@ PROGRAM track
 	
 	trajPerWorker = ntraj/size
 	
-	minU = -2.4283243003838247e-26_8
+!	minU = -2.4283243003838247e-26_8
+	minU = -2.390245661413933e-26_8
 	
 	allocate(states(ntraj,6))
 		
@@ -75,19 +77,28 @@ PROGRAM track
 	END DO
 	CALL RANDOM_SEED(put=rngSeed(1:seedLen))	
 	
-	DO i=1,ntraj,1
-		CALL randomPointTrap(states(i,1), states(i,2), states(i,3), states(i,4), states(i,5), states(i,6))
-	END DO
+!	DO i=1,ntraj,1
+!		CALL randomPointTrap(states(i,1), states(i,2), states(i,3), states(i,4), states(i,5), states(i,6))
+!	END DO
 	
 !	DO i=trajPerWorker*rank+1,trajPerWorker*(rank+1),1
-!		CALL trackEnergyGain(states(i,:), energy_start, energy_end, 0.0_8)
+!		CALL trackEnergyGain(states(i,:), energy_start, energy_end, 0.0_8, 60.0)
 !		PRINT *, rank, i, energy_start, energy_end
 !!		CALL calcEnergy(states(i,:), energy)
 !!		PRINT *, rank, states(i,1), states(i,2), states(i,3),&
 !!			states(i,4), states(i,5), states(i,6), energy/(GRAV*MASS_N)
 !	END DO
 
-	CALL trackAndPrint(states(6, :), 0.0_8)
+	DO i=1,20,1
+		freq = i*10_8
+!		sympT = 0.0_8 + (1.0_8/freq) * 2.0_8 / 3.0_8
+		sympT = 0.1_8
+		height = -1.3_8
+		CALL testEnergyGain(freq, height, sympT, eGain)
+		PRINT *, freq, height, sympT, eGain
+	END DO
+
+!	CALL trackAndPrint(states(6, :), 0.0_8)
 	
 	
 	CALL MPI_FINALIZE(ierr)

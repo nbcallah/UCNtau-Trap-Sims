@@ -4,6 +4,7 @@
 *.o
 test_C_eval
 test_ucntau_fields
+find_min
 *.dSYM*
 *.nb
 *.tar.gz

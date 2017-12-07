@@ -4,7 +4,7 @@ MODULE symplecticInt
 
 CONTAINS
 
-SUBROUTINE symplecticStep(state, deltaT, energy, t)
+SUBROUTINE symplecticStep(state, deltaT, energy, t, freq)
 	!Take 1 step of length deltaT using symplectic integration scheme.
 	!See Candy & Rozmus 1991 and McLachlan & Atela 1992
 	USE constants
@@ -15,9 +15,9 @@ SUBROUTINE symplecticStep(state, deltaT, energy, t)
 	real(kind=PREC), intent(in) :: deltaT
 	real(kind=PREC), intent(out) :: energy
 	real(kind=PREC), optional, intent(inout) :: t
+	real(kind=PREC), optional, intent(in) :: freq
 
 	real(kind=PREC) :: fx, fy, fz, totalU
-	real(kind=PREC), dimension(6) :: stateA
 	integer :: n
 	
 	!Only gets compiled if VARIABLE isn't defined at the top
@@ -26,7 +26,7 @@ SUBROUTINE symplecticStep(state, deltaT, energy, t)
 	!Unrolling the loop - first iteration gives energy but subsequent won't
 	n = 1
 	IF(PRESENT(t)) THEN
-		CALL totalForce(state(1), state(2), state(3), fx, fy, fz, totalU, t)
+		CALL totalForce(state(1), state(2), state(3), fx, fy, fz, totalU, t, freq)
 		energy = totalU + SUM(state(4:6)*state(4:6))/(2.0_8*MASS_N)! &
 !			+ state(1)*GRAV*MASS_N
 		t = t + a(n)*deltaT
@@ -51,7 +51,7 @@ SUBROUTINE symplecticStep(state, deltaT, energy, t)
 	DO n=2,4,1
 		!Calc force
 		IF(PRESENT(t)) THEN
-			CALL totalForce(state(1), state(2), state(3), fx, fy, fz, totalU, t)
+			CALL totalForce(state(1), state(2), state(3), fx, fy, fz, totalU, t, freq)
 			t = t + a(n)*deltaT
 		ELSE
 			CALL totalForce(state(1), state(2), state(3), fx, fy, fz, totalU)

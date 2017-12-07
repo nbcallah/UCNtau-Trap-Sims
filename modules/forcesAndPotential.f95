@@ -19,17 +19,17 @@ SUBROUTINE totalPotential(x, y, z, totalU, t)
 	totalU = totalU - minU
 END SUBROUTINE totalPotential
 
-SUBROUTINE totalForce(x, y, z, fx, fy, fz, totalU, t)
+SUBROUTINE totalForce(x, y, z, fx, fy, fz, totalU, t, freq)
 	IMPLICIT NONE
 	real(kind=PREC), intent(in) :: x, y, z
 	real(kind=PREC), intent(out) :: fx, fy, fz
 	real(kind=PREC), intent(out) :: totalU
-	real(kind=PREC), optional, intent(in) :: t
+	real(kind=PREC), optional, intent(in) :: t, freq
 	
 	IF(PRESENT(t)) THEN
-		CALL force(x, y, z, fx, fy, fz, totalU, t)
+		CALL force(x, y, z, fx, fy, fz, totalU, t, freq)
 	ELSE
-		CALL force(x, y, z, fx, fy, fz, totalU)
+		CALL force(x, y, z, fx, fy, fz, totalU, 0, 0)
 	END IF
 	totalU = totalU - minU
 END SUBROUTINE totalForce

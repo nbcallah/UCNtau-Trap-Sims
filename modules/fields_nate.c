@@ -12,15 +12,16 @@
 #define MASS_N 1.674927471e-27
 #define GRAV 9.80665e0
 #define N_TERMS 3 //how far out to go in field ripple expansion
-#define FREQ 60
+//#define FREQ 60
 //#define FREQ 1000
 #define AMPLITUDE 0.000010
 //#define AMPLITUDE 0.000005
 //#define AMPLITUDE 0.000001
 //#define AMPLITUDE 0.0
 
-void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, double *fz, double *totalU, double* t) //analytical form of halbach field force, mu*del(mod(B))
+void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, double *fz, double *totalU, double* t, double* freq) //analytical form of halbach field force, mu*del(mod(B))
 {
+//	printf("%f %f %e\n", *t, *freq, AMPLITUDE * sin(2*M_PI * (*freq) * (*t)));
 //	printf("%e\n", *x_in);
 //	printf("%p\n", totalU);
 	double A = 4*B_REM/(M_PI*sqrt(2));
@@ -34,16 +35,16 @@ void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, do
 
 	if (x > 0.0)
 	{
-		R = 1.0 + AMPLITUDE * sin(2*M_PI*FREQ * (*t));
+		R = 1.0 + AMPLITUDE * sin(2*M_PI * (*freq) * (*t));
 //		R = 1.0 + AMPLITUDE;
-		r = 0.5 + AMPLITUDE * sin(2*M_PI*FREQ * (*t));
+		r = 0.5 + AMPLITUDE * sin(2*M_PI * (*freq) * (*t));
 //		r = 0.5;
 	}
 	else
 	{
-		R = 0.5 + AMPLITUDE * sin(2*M_PI*FREQ * (*t));
+		R = 0.5 + AMPLITUDE * sin(2*M_PI * (*freq) * (*t));
 //		R = 0.5 + AMPLITUDE;
-		r = 1.0 + AMPLITUDE * sin(2*M_PI*FREQ * (*t));
+		r = 1.0 + AMPLITUDE * sin(2*M_PI * (*freq) * (*t));
 //		r = 1.0;
 	}
 
