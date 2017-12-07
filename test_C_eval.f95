@@ -9,11 +9,11 @@ PROGRAM track
 
 	IMPLICIT NONE
 	real(kind=PREC) :: x, y, z, fx, fy, fz, totalU, energy, sympT
-	real(kind=PREC) :: energy_start, energy_end, eGain
+	real(kind=PREC) :: energy_start, energy_end, maxEgain
 	real(kind=PREC) :: freq, height
 	real(kind=PREC), allocatable :: states(:,:)
 	character(len=64) :: arg
-	integer :: i
+	integer :: i, j, k
 	integer :: seedLen
 	integer, dimension(32) :: rngSeed
 	integer :: rank, size, tag, next, from, ierr, workerIt, trajPerWorker
@@ -77,26 +77,36 @@ PROGRAM track
 	END DO
 	CALL RANDOM_SEED(put=rngSeed(1:seedLen))	
 	
-!	DO i=1,ntraj,1
-!		CALL randomPointTrap(states(i,1), states(i,2), states(i,3), states(i,4), states(i,5), states(i,6))
-!	END DO
-	
-!	DO i=trajPerWorker*rank+1,trajPerWorker*(rank+1),1
-!		CALL trackEnergyGain(states(i,:), energy_start, energy_end, 0.0_8, 60.0)
-!		PRINT *, rank, i, energy_start, energy_end
-!!		CALL calcEnergy(states(i,:), energy)
-!!		PRINT *, rank, states(i,1), states(i,2), states(i,3),&
-!!			states(i,4), states(i,5), states(i,6), energy/(GRAV*MASS_N)
-!	END DO
-
-	DO i=1,20,1
-		freq = i*10_8
-!		sympT = 0.0_8 + (1.0_8/freq) * 2.0_8 / 3.0_8
-		sympT = 0.1_8
-		height = -1.3_8
-		CALL testEnergyGain(freq, height, sympT, eGain)
-		PRINT *, freq, height, sympT, eGain
+	DO i=1,ntraj,1
+		CALL randomPointTrap(states(i,1), states(i,2), states(i,3), states(i,4), states(i,5), states(i,6))
 	END DO
+	
+	DO i=trajPerWorker*rank+1,trajPerWorker*(rank+1),1
+		sympT = 0.0_8
+		CALL trackEnergyGain(states(i,:), energy_start, energy_end, sympT, 30.0_8)
+		PRINT *, rank, i, energy_start, energy_end
+!		CALL calcEnergy(states(i,:), energy)
+!		PRINT *, rank, states(i,1), states(i,2), states(i,3),&
+!			states(i,4), states(i,5), states(i,6), energy/(GRAV*MASS_N)
+	END DO
+
+!	DO i=1,81,1 !Freq
+!		DO j=0,39,1 !Height
+!			maxEgain = 0.0_8
+!			DO k=0,40,1 !Phase
+!				freq = i*2000_8/(80_8)
+!				height = -1.4 + 0.4 * (j/40.0)
+!				sympT = 0.0_8 + (1.0_8/freq) * k / 20.0
+!				CALL testEnergyGain(freq, height, sympT, energy_start, energy_end)
+!				IF ((energy_end - energy_start) > maxEgain) THEN
+!					maxEgain = (energy_end - energy_start)
+!				END IF
+!!				PRINT *, freq, height, j / 20.0 * 2.0 * PI, energy_start*JTONEV, (energy_end - energy_start)*JTONEV
+!			END DO
+!			PRINT *, freq, height, j / 20.0 * 2.0 * PI, energy_start*JTONEV, maxEgain*JTONEV
+!!			PRINT *, i, j, maxEgain*JTONEV
+!		END DO
+!	END DO
 
 !	CALL trackAndPrint(states(6, :), 0.0_8)
 	

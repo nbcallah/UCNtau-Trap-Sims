@@ -52,32 +52,26 @@ SUBROUTINE trackEnergyGain(state, energy_start, energy_end, sympT, freq)
 !	PRINT *, energy_start, energy_end
 END SUBROUTINE trackEnergyGain
 
-SUBROUTINE testEnergyGain(freq, height, sympT, eGain)
+SUBROUTINE testEnergyGain(freq, height, sympT, eStart, eEnd)
 	USE symplecticInt
 	USE constants
 	USE forcesAndPotential
 	IMPLICIT NONE
 	real(kind=PREC), intent(in) :: freq, height
 	real(kind=PREC), intent(inout) :: sympT
-	real(kind=PREC), intent(out) :: eGain
+	real(kind=PREC), intent(out) :: eStart, eEnd
 
 	real(kind=PREC), dimension(6) :: state
-	real(kind=PREC) :: eStart, eEnd
 	integer :: i, numSteps
 	
 	state = (/0.05_8, 0.0_8, height, 0.0_8, 0.0_8, 0.0_8/)
 	CALL calcEnergy(state, eStart)
 
 	numSteps = 10e0/dt
-!	totalU = 0.0_8
 	
 	DO i=1,numSteps,1
 		CALL symplecticStep(state, dt, eEnd, sympT, freq)
-!		sympT = sympT+dt
-!		PRINT *, sympT, eEnd
-!		PRINT *, eEnd, state(3), height / 4.0_8, state(6)
 		IF (state(3) >= -1.5_8 + ((height + 1.5) / 4.0_8) .AND. state(6) > 0) THEN
-			eGain = eEnd - eStart
 			EXIT
 		END IF
 	END DO

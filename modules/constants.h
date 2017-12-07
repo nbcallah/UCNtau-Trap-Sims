@@ -3,6 +3,8 @@
 #define MASS_N 1.674927471e-27_8
 #define GRAV 9.80665e0_8
 
+#define JTONEV 6.2415091e27_8
+
 !PREC is size of float in bytes
 #define PREC 8
 
