@@ -4,7 +4,7 @@ VPATH=modules
 MODOBJ=constants.o forcesAndPotential.o symplecticInt.o testSubroutines.o trackGeometry.o
 #COBJ=modules/fields_fortran_dan.o modules/fields_nate.o
 COBJ=fields_nate.o
-LFLAGS=-L/N/u/nbcallah/BigRed2/libraries/lib -lnlopt
+LFLAGS=-L/N/u/nbcallah/BigRed2/libraries/lib -lnlopt -lm
 
 #all: symplecticInt trajGen henonHeiles symplecticIntNoPert symplecticIntNoPertEscape #symplecticIntPertEscapeFieldStrength biasedVsqDescent
 
@@ -23,7 +23,7 @@ LFLAGS=-L/N/u/nbcallah/BigRed2/libraries/lib -lnlopt
 #trajGen: $(MODOBJ) symplecticTrajectory.o
 #	$(F95) $(MODOBJ) symplecticTrajectory.o -o trajGen $(LFLAGS)
 
-all: test_C_eval test_ucntau_fields find_min
+all: test_C_eval test_ucntau_fields
 
 test_C_eval: $(MODOBJ) test_C_eval.o modules/fields_nate.o
 	$(F95) $(MODOBJ) $(COBJ) test_C_eval.o -o test_C_eval $(LFLAGS)
