@@ -65,7 +65,7 @@ SUBROUTINE trackDaggerHitTime(state)
 	
 	t = 0.0_8
 	
-	numSteps = 20e0/dt
+	numSteps = (20.0_8 + 50.0_8)/dt
 	DO i=1,numSteps,1
 		CALL symplecticStep(state, dt, energy)
 		t = t + dt
