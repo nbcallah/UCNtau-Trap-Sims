@@ -19,6 +19,83 @@ SUBROUTINE compPots()
 	END DO
 END SUBROUTINE compPots
 
+SUBROUTINE zOffDipCalc(t, z)
+	real(kind=PREC), intent(in) :: t
+	real(kind=PREC), intent(out) :: z
+	
+	real(kind=PREC) :: speed
+	real(kind=PREC), dimension(10) :: dipHeights
+	real(kind=PREC), dimension(10) :: dipEnds
+	
+	integer :: i
+	
+	IF (t > dipEnds(10)) THEN
+		zOff = 0.01
+	END IF
+	
+	dipHeights = (/0.49, 0.380, 0.250, 0.180, 0.140, 0.110, 0.080, 0.060, 0.040, 0.010/)
+	dipEnds = (/0.0, 20.0, 60.0, 80.0, 100.0, 120.0, 140.0, 160.0, 180.0, 280.0/)
+	
+	speed = 0.49_8/13.0_8
+	
+	DO i=1,10,1
+		IF (dipEnds(i) > t) THEN
+			EXIT
+		END IF
+	END DO
+	
+	z = dipHeights(i-1) - speed*(t-dipEnds(i-1))
+	
+	IF (z < dipHeights(i)) THEN
+		z = dipHeights(i)
+	END IF
+END SUBROUTINE zOffDipCalc
+
+SUBROUTINE trackDaggerHitTime(state)
+	USE symplecticInt
+	USE constants
+	USE forcesAndPotential
+	IMPLICIT NONE
+	real(kind=PREC), dimension(6), intent(inout) :: state
+	real(kind=PREC), dimension(6) :: prevState
+
+	real(kind=PREC) :: t, fracTravel, predX, predZ, energy, zOff
+	
+	integer :: i, numSteps
+	
+	t = 0.0_8
+	
+	numSteps = 20e0/dt
+	DO i=1,numSteps,1
+		CALL symplecticStep(state, dt, energy)
+		t = t + dt
+	END DO
+	
+	DO
+		prevState = state
+		CALL symplecticStep(state, dt, energy)
+		t = t + dt
+		IF (SIGN(1.0_8, state(2)) .NE. SIGN(1.0_8, prevState(2))) THEN
+			fracTravel = ABS(prevState(2))/(ABS(state(2)) + ABS(prevState(2)))
+			predX = prevState(1) + fracTravel * (state(1) - prevState(1))
+			predZ = prevState(3) + fracTravel * (state(3) - prevState(3))
+			
+			CALL zOffDipCalc(t - 20.0_8, zOff)
+			IF (ABS(predX) < .2 .AND. predZ > (-1.5_8 + zOff) .AND. predZ < (-1.5_8 + zOff + 0.2_8)) THEN
+				PRINT *, t
+				EXIT
+			END IF
+			
+			IF (t > 1000) THEN
+				EXIT
+			END IF
+!			PRINT *, predX, predZ
+!			PRINT *, state(1), state(2), state(3)
+!			PRINT *, prevState(2), prevState(2) + fracTravel * (state(2) - prevState(2)), state(2)
+		END IF
+	END DO
+END SUBROUTINE trackDaggerHitTime
+
 SUBROUTINE trackEnergyGain(state, energy_start, energy_end, sympT, freq)
 	USE symplecticInt
 	USE constants

@@ -82,12 +82,10 @@ PROGRAM track
 	END DO
 	
 	DO i=trajPerWorker*rank+1,trajPerWorker*(rank+1),1
-		sympT = 0.0_8
-		CALL trackEnergyGain(states(i,:), energy_start, energy_end, sympT, 30.0_8)
-		PRINT *, rank, i, energy_start, energy_end
-!		CALL calcEnergy(states(i,:), energy)
-!		PRINT *, rank, states(i,1), states(i,2), states(i,3),&
-!			states(i,4), states(i,5), states(i,6), energy/(GRAV*MASS_N)
+!		sympT = 0.0_8
+!		CALL trackEnergyGain(states(i,:), energy_start, energy_end, sympT, 30.0_8)
+!		PRINT *, rank, i, energy_start, energy_end
+		CALL trackDaggerHitTime(states(i, :))
 	END DO
 
 !	DO i=1,81,1 !Freq
@@ -109,6 +107,7 @@ PROGRAM track
 !	END DO
 
 !	CALL trackAndPrint(states(6, :), 0.0_8)
+!	CALL trackDaggerHitTime(states(ntraj, :))
 	
 	
 	CALL MPI_FINALIZE(ierr)
