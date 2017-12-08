@@ -59,7 +59,7 @@ SUBROUTINE trackDaggerHitTime(state)
 	real(kind=PREC), dimension(6), intent(inout) :: state
 	real(kind=PREC), dimension(6) :: prevState
 
-	real(kind=PREC) :: t, fracTravel, predX, predZ, energy, zOff
+	real(kind=PREC) :: t, fracTravel, predX, predZ, energy, zOff, zeta
 	
 	integer :: i, numSteps
 	
@@ -81,8 +81,15 @@ SUBROUTINE trackDaggerHitTime(state)
 			predZ = prevState(3) + fracTravel * (state(3) - prevState(3))
 			
 			CALL zOffDipCalc(t - 20.0_8, zOff)
-			IF (ABS(predX) < .2 .AND. predZ > (-1.5_8 + zOff) .AND. predZ < (-1.5_8 + zOff + 0.2_8)) THEN
-				PRINT *, t
+			IF (state(1) > 0.0) THEN
+				zeta = 0.5_8 - SQRT(state(1)**2 &
+				                  + (SQRT(state(2)**2 + (state(3) - zOff)**2) - 1.0_8)**2)
+			ELSE
+				zeta = 1.0_8 - SQRT(state(1)**2 &
+				                  + (SQRT(state(2)**2 + (state(3) - zOff)**2) - 0.5_8)**2)
+			END IF
+			IF (ABS(predX) < .2 .AND. zeta > 0.0_8 .AND. predZ < (-1.5_8 + zOff + 0.2_8)) THEN
+				PRINT *, t, predX, predZ - zOff
 				EXIT
 			END IF
 			
