@@ -8,8 +8,8 @@
 
 int main(int argc, char** argv) {
 	double x, y, z, fx, fy, fz, u, t, freq;
-	x = 0.0;
-	y = 0.0;
+	x = 0.05;
+	y = 0.1;
 	z = 0.0;
 	t = 0.0;
 	freq = 0.0;

@@ -34,7 +34,7 @@ SUBROUTINE zOffDipCalc(t, z)
 	END IF
 	
 	dipHeights = (/0.49, 0.380, 0.250, 0.180, 0.140, 0.110, 0.080, 0.060, 0.040, 0.010/)
-	dipEnds = (/0.0, 20.0, 60.0, 80.0, 100.0, 120.0, 140.0, 160.0, 180.0, 280.0/)
+	dipEnds =     (/0.0,  40.0,  80.0,  100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 300.0/)
 	
 	speed = 0.49_8/13.0_8
 	
@@ -80,16 +80,14 @@ SUBROUTINE trackDaggerHitTime(state)
 			predX = prevState(1) + fracTravel * (state(1) - prevState(1))
 			predZ = prevState(3) + fracTravel * (state(3) - prevState(3))
 			
-			CALL zOffDipCalc(t - 20.0_8, zOff)
-			IF (state(1) > 0.0) THEN
-				zeta = 0.5_8 - SQRT(state(1)**2 &
-				                  + (SQRT(state(2)**2 + (state(3) - zOff)**2) - 1.0_8)**2)
+			CALL zOffDipCalc(t - (20.0_8 + 50.0_8), zOff)
+			IF (predX > 0.0) THEN
+				zeta = 0.5_8 - SQRT(predX**2 + (ABS(predZ - zOff) - 1.0_8)**2)
 			ELSE
-				zeta = 1.0_8 - SQRT(state(1)**2 &
-				                  + (SQRT(state(2)**2 + (state(3) - zOff)**2) - 0.5_8)**2)
+				zeta = 1.0_8 - SQRT(predX**2 + (ABS(predZ - zOff) - 0.5_8)**2)
 			END IF
 			IF (ABS(predX) < .2 .AND. zeta > 0.0_8 .AND. predZ < (-1.5_8 + zOff + 0.2_8)) THEN
-				PRINT *, t, predX, predZ - zOff
+				PRINT *, t - (20.0_8 + 50.0_8), predX, predZ - zOff
 				EXIT
 			END IF
 			
@@ -184,6 +182,7 @@ SUBROUTINE trackAndPrint(state, sympT)
 	energy = 0.0
 	
 	DO i=1,numSteps,1
+!		IF(t > 92.52_8 .AND. t < 92.56_8) THEN
 		IF(INT(dt*10_8*i)-INT(dt*10_8*(i-1)) .NE. 0) THEN
 !		IF(1 .EQ. 1) THEN
 !			energy = totalU + SUM(state(1,4:6)**2)/(2.0_8*MASS_N)

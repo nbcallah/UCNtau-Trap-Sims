@@ -75,8 +75,13 @@ PROGRAM track
 	DO i=2,seedLen,1
 		rngSeed(i) = MOD((48271*rngSeed(i-1)), 2147483647)
 	END DO
-	CALL RANDOM_SEED(put=rngSeed(1:seedLen))	
+	CALL RANDOM_SEED(put=rngSeed(1:seedLen))
 	
+!	DO i=1,100,1
+!		CALL zOffDipCalc(i*(250.0_8/100.0_8), z)
+!		PRINT *, z, i*(250.0_8/100.0_8)
+!	END DO
+		
 	DO i=1,ntraj,1
 		CALL randomPointTrap(states(i,1), states(i,2), states(i,3), states(i,4), states(i,5), states(i,6))
 	END DO
@@ -85,6 +90,7 @@ PROGRAM track
 !		sympT = 0.0_8
 !		CALL trackEnergyGain(states(i,:), energy_start, energy_end, sympT, 30.0_8)
 !		PRINT *, rank, i, energy_start, energy_end
+!		PRINT *, rank, i, (energy_end - energy_start)/energy_start
 		CALL trackDaggerHitTime(states(i, :))
 	END DO
 
@@ -106,12 +112,10 @@ PROGRAM track
 !		END DO
 !	END DO
 
-!	CALL trackAndPrint(states(6, :), 0.0_8)
+!	CALL trackAndPrint(states(ntraj, :), 0.0_8)
 !	CALL trackDaggerHitTime(states(ntraj, :))
 	
 	
 	CALL MPI_FINALIZE(ierr)
-	
-!	CALL trackAndPrint(states(1,:,:), 0.0_8)
 	
 END PROGRAM track

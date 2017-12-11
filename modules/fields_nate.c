@@ -14,10 +14,10 @@
 #define N_TERMS 3 //how far out to go in field ripple expansion
 //#define FREQ 60
 //#define FREQ 1000
-#define AMPLITUDE 0.000010
+//#define AMPLITUDE 0.000010
 //#define AMPLITUDE 0.000005
 //#define AMPLITUDE 0.000001
-//#define AMPLITUDE 0.0
+#define AMPLITUDE 0.0
 
 void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, double *fz, double *totalU, double* t, double* freq) //analytical form of halbach field force, mu*del(mod(B))
 {
@@ -61,17 +61,22 @@ void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, do
 		double k_n;
 
 		for (int n = 1; n <= N_TERMS; n += 1)
+//		for (int n = N_TERMS; n > 0; n -= 1)
 		{
 			k_n = 2*M_PI*(4.0*n-3.0)/MAG_SPACE;
 			
 			cos_term = (n%2 == 0 ? 1 : -1)/(4.0*n-3.0)*(1-exp(-k_n*MAG_THICK))*exp(-k_n*zeta)*cos(k_n*eta);
 			sin_term = (n%2 == 0 ? 1 : -1)/(4.0*n-3.0)*(1-exp(-k_n*MAG_THICK))*exp(-k_n*zeta)*sin(k_n*eta);
 			
+//			printf("%.15e %.15e %.15e\n", k_n, cos_term, sin_term);
+			
 			sum_cos += cos_term;
 			sum_k_cos += k_n*cos_term;
 			sum_sin += sin_term;
 			sum_k_sin += k_n*sin_term;
 		}
+		
+//		printf("%.15e %.15e %.15e %.15e\n", sum_cos, sum_sin, sum_k_cos, sum_k_sin);
 		
 		double b_zeta = A*sum_cos;
 		double b_eta = A*sum_sin;
