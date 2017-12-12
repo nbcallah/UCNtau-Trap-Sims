@@ -1,7 +1,7 @@
 F95=ftn
 FFLAGS=-cpp -O3 -I/N/u/nbcallah/BigRed2/libraries/include/
 VPATH=modules
-MODOBJ=constants.o forcesAndPotential.o symplecticInt.o testSubroutines.o trackGeometry.o
+MODOBJ=constants.o forcesAndPotential.o symplecticInt.o trackGeometry.o testSubroutines.o
 #COBJ=modules/fields_fortran_dan.o modules/fields_nate.o
 COBJ=fields_nate.o
 LFLAGS=-L/N/u/nbcallah/BigRed2/libraries/lib -lnlopt -lm
