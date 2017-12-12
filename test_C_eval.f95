@@ -14,6 +14,7 @@ PROGRAM track
 	real(kind=PREC), allocatable :: states(:,:)
 	character(len=256) :: arg
 	character(len=256) :: fName
+	character(len=256) :: rankString
 	integer :: i, j, k
 	integer :: seedLen
 	integer, dimension(32) :: rngSeed
@@ -37,6 +38,12 @@ PROGRAM track
 	READ(arg,*) ntraj
 	CALL GETARG(3, arg)
 	READ(arg,*) fName
+	
+	write (rankString, "(I0)") rank
+	
+	fName = TRIM(fName) // TRIM(rankString)
+	
+	PRINT *, fName
 	
 	OPEN(UNIT=1,FILE=fName, FORM='UNFORMATTED')
 	
