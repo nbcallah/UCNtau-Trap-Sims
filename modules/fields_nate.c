@@ -18,6 +18,7 @@
 //#define AMPLITUDE 0.000005
 //#define AMPLITUDE 0.000001
 #define AMPLITUDE 0.0
+#define KAPPA 1000
 
 void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, double *fz, double *totalU, double* t, double* freq) //analytical form of halbach field force, mu*del(mod(B))
 {
@@ -31,22 +32,12 @@ void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, do
 	double z = *z_in;
 	double z_grav = *z_in;
 
-	double gx=0.0, gy=0.0, gz=0.0, R, r;
-
-	if (x > 0.0)
-	{
-		R = 1.0 + AMPLITUDE * sin(2*M_PI * (*freq) * (*t));
-//		R = 1.0 + AMPLITUDE;
-		r = 0.5 + AMPLITUDE * sin(2*M_PI * (*freq) * (*t));
-//		r = 0.5;
-	}
-	else
-	{
-		R = 0.5 + AMPLITUDE * sin(2*M_PI * (*freq) * (*t));
-//		R = 0.5 + AMPLITUDE;
-		r = 1.0 + AMPLITUDE * sin(2*M_PI * (*freq) * (*t));
-//		r = 1.0;
-	}
+	double gx=0.0, gy=0.0, gz=0.0, R, r, Rprime, rprime;
+	
+	R = 0.5 + 0.5/(1 + exp(-KAPPA*x));
+	r = 1.0 - 0.5/(1 + exp(-KAPPA*x));
+	Rprime = 0.5*KAPPA*(1.0 - 1.0/(1 + exp(-KAPPA*x)))*1.0/(1 + exp(-KAPPA*x));
+	rprime = -Rprime;
 
 	double rho = sqrt(y*y+z*z);
 	double r_zeta = sqrt((rho-R)*(rho-R)+x*x);
@@ -94,33 +85,38 @@ void force_(double *x_in, double *y_in, double *z_in, double *fx, double *fy, do
 		double d_Bh[3] = {0.0,
 						  -B_HOLD*(r+R)*y/(pow(y*y + z*z, 3.0/2.0)),
 						  -B_HOLD*(r+R)*z/(pow(y*y + z*z, 3.0/2.0))};
-		double d_Zeta[3] = {-(x
-							  /
-							  sqrt(
-								  x*x + ((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z)))
-							  )
-							 ),
+		double d_Zeta[3] = {rprime
+								+
+							(Rprime*(sqrt(y*y + z*z) - R) - x)
+										/
+							sqrt(x*x + ((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z)))),
+
 							-y*(sqrt(y*y + z*z) - R)
 								/(
 								  sqrt(y*y + z*z)
 								  *sqrt(x*x + ((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z))))
 							     ),
+
 							-z*(sqrt(y*y + z*z) - R)
 								/(
 								  sqrt(y*y + z*z)
 								  *sqrt(x*x + ((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z))))
 							     )};
-		double d_Eta[3] = {r
-			               /(
-			                 (sqrt(y*y + z*z) - R)
-			                 *(1.0 + x*x/((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z))))
-		                    ),
+		double d_Eta[3] = {-rprime*atan(
+								x/(R - sqrt(y*y + z*z))
+							)
+								-
+							(r*(R - sqrt(y*y + z*z) - x*Rprime))
+							/
+							(x*x + y*y + z*z + R*R - 2*R*sqrt(y*y + z*z)),
+
 						   -r*x*y
 							/(
 							   sqrt(y*y + z*z)
 							   *((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z)))
 							   *(1.0 + x*x/((R - sqrt(y*y + z*z))*(R - sqrt(y*y + z*z))))
 						     ),
+
 						   -r*x*z
 							/(
 							   sqrt(y*y + z*z)

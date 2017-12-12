@@ -182,7 +182,7 @@ SUBROUTINE trackAndPrint(state, sympT)
 	energy = 0.0
 	
 	DO i=1,numSteps,1
-!		IF(t > 92.52_8 .AND. t < 92.56_8) THEN
+!		IF(t > 475.0_8 .AND. t < 480.0_8) THEN
 		IF(INT(dt*10_8*i)-INT(dt*10_8*(i-1)) .NE. 0) THEN
 !		IF(1 .EQ. 1) THEN
 !			energy = totalU + SUM(state(1,4:6)**2)/(2.0_8*MASS_N)
