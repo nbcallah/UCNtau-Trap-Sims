@@ -51,6 +51,39 @@ SUBROUTINE zOffDipCalc(t, z)
 	END IF
 END SUBROUTINE zOffDipCalc
 
+SUBROUTINE reflect(state, norm, tang)
+	USE trackGeometry
+	USE constants
+	real(kind=PREC), dimension(6), intent(inout) :: state
+	real(kind=PREC), dimension(3), intent(in) :: norm, tang
+	real(kind=PREC) :: u1, u2, theta, phi, pN, pT, pTprime, pLen, pTarget
+	real(kind=PREC), dimension(3) :: tangPrime, newPdir
+	
+	pTarget = SQRT(state(4)**2 + state(5)**2 + state(6)**2)
+	
+	CALL cross(norm, tang, tangPrime)
+	
+	CALL RANDOM_NUMBER(u1)
+	CALL RANDOM_NUMBER(u2)
+	theta = ASIN(SQRT(u1))
+	phi = 2.0_8 * PI * u2
+
+	pN = COS(theta)
+	pT = SIN(theta)*COS(phi)
+	pTprime = SIN(theta)*SIN(phi)
+	
+	newPdir = pN*norm + pT*tang + pTprime*tangPrime
+
+	state(4) = newPdir(1)
+	state(5) = newPdir(2)
+	state(6) = newPdir(3)
+	
+	pLen = SQRT(state(4)**2 + state(5)**2 + state(6)**2)
+	state(4) = state(4) * pTarget/pLen
+	state(5) = state(5) * pTarget/pLen
+	state(6) = state(6) * pTarget/pLen
+END SUBROUTINE reflect
+
 SUBROUTINE trackDaggerHitTime(state)
 	USE symplecticInt
 	USE constants
@@ -60,8 +93,15 @@ SUBROUTINE trackDaggerHitTime(state)
 	real(kind=PREC), dimension(6) :: prevState
 
 	real(kind=PREC) :: t, fracTravel, predX, predZ, energy, zOff, zeta
+	real(kind=PREC), dimension(10) :: hitT
+	real(kind=PREC), dimension(10) :: hitE
 	
-	integer :: i, numSteps
+	integer :: i, numSteps, nHit
+	
+	nHit = 0
+		
+	hitT = 0.0_8
+	hitE = 0.0_8
 	
 	t = 0.0_8
 	
@@ -87,18 +127,31 @@ SUBROUTINE trackDaggerHitTime(state)
 				zeta = 1.0_8 - SQRT(predX**2 + (ABS(predZ - zOff) - 0.5_8)**2)
 			END IF
 			IF (ABS(predX) < .2 .AND. zeta > 0.0_8 .AND. predZ < (-1.5_8 + zOff + 0.2_8)) THEN
-				PRINT *, t - (20.0_8 + 50.0_8), predX, predZ - zOff
-				EXIT
+				nHit = nHit + 1
+				hitT(nHit) = t - (20.0_8 + 50.0_8)
+				hitE(nHit) = energy
+				IF (nHit .EQ. 10) THEN
+					EXIT
+				END IF
+				IF (prevState(2) > 0 .AND. prevState(5) < 0) THEN
+					CALL reflect(prevState, (/0.0_8, 1.0_8, 0.0_8/), (/0.0_8, 0.0_8, 1.0_8/))
+					state = prevState
+				ELSE IF (prevState(2) < 0 .AND. prevState(5) > 0) THEN
+					CALL reflect(prevState, (/0.0_8, -1.0_8, 0.0_8/), (/0.0_8, 0.0_8, 1.0_8/))
+					state = prevState
+				ELSE
+					PRINT *, "UHOH"
+				END IF
+!				WRITE(1) t - (20.0_8 + 50.0_8), predX, predZ - zOff
+!				EXIT
 			END IF
 			
 			IF (t > 1000) THEN
 				EXIT
 			END IF
-!			PRINT *, predX, predZ
-!			PRINT *, state(1), state(2), state(3)
-!			PRINT *, prevState(2), prevState(2) + fracTravel * (state(2) - prevState(2)), state(2)
 		END IF
 	END DO
+	WRITE(1) hitT, hitE
 END SUBROUTINE trackDaggerHitTime
 
 SUBROUTINE trackEnergyGain(state, energy_start, energy_end, sympT, freq)

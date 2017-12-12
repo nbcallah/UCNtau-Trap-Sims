@@ -11,3 +11,4 @@ find_min
 *.ipynb
 *.DS_Store
 *results/
+*.bin

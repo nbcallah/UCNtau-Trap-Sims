@@ -12,7 +12,8 @@ PROGRAM track
 	real(kind=PREC) :: energy_start, energy_end, maxEgain
 	real(kind=PREC) :: freq, height
 	real(kind=PREC), allocatable :: states(:,:)
-	character(len=64) :: arg
+	character(len=256) :: arg
+	character(len=256) :: fName
 	integer :: i, j, k
 	integer :: seedLen
 	integer, dimension(32) :: rngSeed
@@ -23,9 +24,9 @@ PROGRAM track
 	CALL MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierr)
 	CALL MPI_COMM_SIZE(MPI_COMM_WORLD, size, ierr)
 	
-	IF (IARGC() .NE. 2) THEN
+	IF (IARGC() .NE. 3) THEN
 		PRINT *, "Error! Not enough or too many arguments!"
-		PRINT *, "timestep n_traj"
+		PRINT *, "timestep n_traj OUTFILE"
 		CALL MPI_FINALIZE(ierr)
 		CALL EXIT(0)
 	END IF
@@ -34,6 +35,10 @@ PROGRAM track
 	READ(arg,*) dt
 	CALL GETARG(2, arg)
 	READ(arg,*) ntraj
+	CALL GETARG(3, arg)
+	READ(arg,*) fName
+	
+	OPEN(UNIT=1,FILE=fName, FORM='UNFORMATTED')
 	
 	trajPerWorker = ntraj/size
 	
