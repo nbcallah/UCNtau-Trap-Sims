@@ -129,7 +129,7 @@ SUBROUTINE trackDaggerHitTime(state)
 			IF (ABS(predX) < .2 .AND. zeta > 0.0_8 .AND. predZ < (-1.5_8 + zOff + 0.2_8)) THEN
 				nHit = nHit + 1
 				hitT(nHit) = t - (20.0_8 + 50.0_8)
-				hitE(nHit) = energy
+				hitE(nHit) = state(5)*state(5)/(2.0_8*MASS_N)
 				IF (nHit .EQ. 10) THEN
 					EXIT
 				END IF
