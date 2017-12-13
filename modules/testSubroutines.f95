@@ -24,12 +24,12 @@ SUBROUTINE zOffDipCalc(t, z)
 	real(kind=PREC), intent(out) :: z
 	
 	real(kind=PREC) :: speed
-	real(kind=PREC), dimension(10) :: dipHeights
-	real(kind=PREC), dimension(10) :: dipEnds
+	real(kind=PREC), dimension(4) :: dipHeights
+	real(kind=PREC), dimension(4) :: dipEnds
 	
 	integer :: i
 	
-	IF (t > dipEnds(10)) THEN
+	IF (t > dipEnds(4)) THEN
 		zOff = 0.01
 	END IF
 	
@@ -40,7 +40,7 @@ SUBROUTINE zOffDipCalc(t, z)
 	
 	speed = 0.49_8/13.0_8
 	
-	DO i=1,10,1
+	DO i=1,4,1
 		IF (dipEnds(i) > t) THEN
 			EXIT
 		END IF
