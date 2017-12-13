@@ -36,8 +36,8 @@ PROGRAM track
 	READ(arg,*) dt
 	CALL GETARG(2, arg)
 	READ(arg,*) ntraj
-	CALL GETARG(3, arg)
-	READ(arg,*) fName
+	CALL GETARG(3, fName)
+!	READ(arg, FORMAT=A) fName
 	
 	write (rankString, "(I0)") rank
 	

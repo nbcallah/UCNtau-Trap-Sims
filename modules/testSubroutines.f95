@@ -24,21 +24,23 @@ SUBROUTINE zOffDipCalc(t, z)
 	real(kind=PREC), intent(out) :: z
 	
 	real(kind=PREC) :: speed
-	real(kind=PREC), dimension(10) :: dipHeights
-	real(kind=PREC), dimension(10) :: dipEnds
+	real(kind=PREC), dimension(4) :: dipHeights
+	real(kind=PREC), dimension(4) :: dipEnds
 	
 	integer :: i
 	
-	IF (t > dipEnds(10)) THEN
+	IF (t > dipEnds(4)) THEN
 		zOff = 0.01
 	END IF
 	
-	dipHeights = (/0.49, 0.380, 0.250, 0.180, 0.140, 0.110, 0.080, 0.060, 0.040, 0.010/)
-	dipEnds =     (/0.0,  40.0,  80.0,  100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 300.0/)
+!	dipHeights = (/0.49, 0.380, 0.250, 0.180, 0.140, 0.110, 0.080, 0.060, 0.040, 0.010/)
+	dipHeights = (/0.49, 0.380, 0.250, 0.01/)
+!	dipEnds =     (/0.0,  40.0,  80.0,  100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 300.0/)
+	dipEnds =     (/0.0,  40.0,  400.0,  500.0/)
 	
 	speed = 0.49_8/13.0_8
 	
-	DO i=1,10,1
+	DO i=1,4,1
 		IF (dipEnds(i) > t) THEN
 			EXIT
 		END IF
@@ -93,8 +95,9 @@ SUBROUTINE trackDaggerHitTime(state)
 	real(kind=PREC), dimension(6) :: prevState
 
 	real(kind=PREC) :: t, fracTravel, predX, predZ, energy, zOff, zeta
-	real(kind=PREC), dimension(10) :: hitT
-	real(kind=PREC), dimension(10) :: hitE
+	real(kind=PREC) :: settlingTime
+	real(kind=PREC), dimension(20) :: hitT
+	real(kind=PREC), dimension(20) :: hitE
 	
 	integer :: i, numSteps, nHit
 	
@@ -105,7 +108,9 @@ SUBROUTINE trackDaggerHitTime(state)
 	
 	t = 0.0_8
 	
-	numSteps = (20.0_8 + 50.0_8)/dt
+	settlingTime = 20.0_8 + 200.0_8
+	
+	numSteps = settlingTime/dt
 	DO i=1,numSteps,1
 		CALL symplecticStep(state, dt, energy)
 		t = t + dt
@@ -120,17 +125,17 @@ SUBROUTINE trackDaggerHitTime(state)
 			predX = prevState(1) + fracTravel * (state(1) - prevState(1))
 			predZ = prevState(3) + fracTravel * (state(3) - prevState(3))
 			
-			CALL zOffDipCalc(t - (20.0_8 + 50.0_8), zOff)
-			IF (predX > 0.0) THEN
+			CALL zOffDipCalc(t - settlingTime, zOff)
+			IF (predX > 0.0_8) THEN
 				zeta = 0.5_8 - SQRT(predX**2 + (ABS(predZ - zOff) - 1.0_8)**2)
 			ELSE
 				zeta = 1.0_8 - SQRT(predX**2 + (ABS(predZ - zOff) - 0.5_8)**2)
 			END IF
 			IF (ABS(predX) < .2 .AND. zeta > 0.0_8 .AND. predZ < (-1.5_8 + zOff + 0.2_8)) THEN
 				nHit = nHit + 1
-				hitT(nHit) = t - (20.0_8 + 50.0_8)
+				hitT(nHit) = t - settlingTime
 				hitE(nHit) = state(5)*state(5)/(2.0_8*MASS_N)
-				IF (nHit .EQ. 10) THEN
+				IF (nHit .EQ. 20) THEN
 					EXIT
 				END IF
 				IF (prevState(2) > 0 .AND. prevState(5) < 0) THEN
@@ -146,7 +151,7 @@ SUBROUTINE trackDaggerHitTime(state)
 !				EXIT
 			END IF
 			
-			IF (t > 1000) THEN
+			IF (t > 2000) THEN
 				EXIT
 			END IF
 		END IF
