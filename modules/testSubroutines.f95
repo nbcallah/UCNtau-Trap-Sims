@@ -96,8 +96,8 @@ SUBROUTINE trackDaggerHitTime(state)
 
 	real(kind=PREC) :: t, fracTravel, predX, predZ, energy, zOff, zeta
 	real(kind=PREC) :: settlingTime
-	real(kind=PREC), dimension(10) :: hitT
-	real(kind=PREC), dimension(10) :: hitE
+	real(kind=PREC), dimension(20) :: hitT
+	real(kind=PREC), dimension(20) :: hitE
 	
 	integer :: i, numSteps, nHit
 	
@@ -126,7 +126,7 @@ SUBROUTINE trackDaggerHitTime(state)
 			predZ = prevState(3) + fracTravel * (state(3) - prevState(3))
 			
 			CALL zOffDipCalc(t - settlingTime, zOff)
-			IF (predX > 0.0) THEN
+			IF (predX > 0.0_8) THEN
 				zeta = 0.5_8 - SQRT(predX**2 + (ABS(predZ - zOff) - 1.0_8)**2)
 			ELSE
 				zeta = 1.0_8 - SQRT(predX**2 + (ABS(predZ - zOff) - 0.5_8)**2)
@@ -135,7 +135,7 @@ SUBROUTINE trackDaggerHitTime(state)
 				nHit = nHit + 1
 				hitT(nHit) = t - settlingTime
 				hitE(nHit) = state(5)*state(5)/(2.0_8*MASS_N)
-				IF (nHit .EQ. 10) THEN
+				IF (nHit .EQ. 20) THEN
 					EXIT
 				END IF
 				IF (prevState(2) > 0 .AND. prevState(5) < 0) THEN
@@ -151,7 +151,7 @@ SUBROUTINE trackDaggerHitTime(state)
 !				EXIT
 			END IF
 			
-			IF (t > 1000) THEN
+			IF (t > 2000) THEN
 				EXIT
 			END IF
 		END IF
