@@ -23,24 +23,26 @@ SUBROUTINE zOffDipCalc(t, z)
 	real(kind=PREC), intent(in) :: t
 	real(kind=PREC), intent(out) :: z
 	
+	integer :: nDips = 10
 	real(kind=PREC) :: speed
-	real(kind=PREC), dimension(4) :: dipHeights
-	real(kind=PREC), dimension(4) :: dipEnds
+	real(kind=PREC), dimension(10) :: dipHeights
+	real(kind=PREC), dimension(10) :: dipEnds
 	
 	integer :: i
 	
-	IF (t > dipEnds(4)) THEN
-		zOff = 0.01
+	IF (t > dipEnds(nDips)) THEN
+		z = 0.01
+		RETURN
 	END IF
 	
 !	dipHeights = (/0.49, 0.380, 0.250, 0.180, 0.140, 0.110, 0.080, 0.060, 0.040, 0.010/)
-	dipHeights = (/0.49, 0.380, 0.250, 0.01/)
+	dipHeights = (/0.49, 0.380, 0.250, 0.180, 0.01/)
 !	dipEnds =     (/0.0,  40.0,  80.0,  100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 300.0/)
-	dipEnds =     (/0.0,  40.0,  400.0,  500.0/)
+	dipEnds =     (/0.0,  40.0, 80.0,  400.0, 500.0/)
 	
 	speed = 0.49_8/13.0_8
 	
-	DO i=1,4,1
+	DO i=1,nDips,1
 		IF (dipEnds(i) > t) THEN
 			EXIT
 		END IF
