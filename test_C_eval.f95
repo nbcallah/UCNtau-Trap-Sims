@@ -103,7 +103,8 @@ PROGRAM track
 !		CALL trackEnergyGain(states(i,:), energy_start, energy_end, sympT, 30.0_8)
 !		PRINT *, rank, i, energy_start, energy_end
 !		PRINT *, rank, i, (energy_end - energy_start)/energy_start
-		CALL trackDaggerHitTime(states(i, :))
+!		CALL trackDaggerHitTime(states(i, :))
+		CALL trackDaggerHitTimeFixedEff(states(i, :))
 	END DO
 
 !	DO i=1,81,1 !Freq

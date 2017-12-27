@@ -203,7 +203,7 @@ SUBROUTINE trackDaggerHitTimeFixedEff(state)
 			END IF
 			IF (ABS(predX) < .2 .AND. zeta > 0.0_8 .AND. predZ < (-1.5_8 + zOff + 0.2_8)) THEN
                 CALL RANDOM_NUMBER(hitU)
-                IF (hitU < eff) THEN
+                IF (hitU < 0.155) THEN
                     WRITE(1) t - settlingTime, energy, state(5)*state(5)/(2.0_8*MASS_N)
                     EXIT
                 END IF
@@ -225,7 +225,7 @@ SUBROUTINE trackDaggerHitTimeFixedEff(state)
 			END IF
 		END IF
 	END DO
-END SUBROUTINE trackDaggerHitTime
+END SUBROUTINE trackDaggerHitTimeFixedEff
 
 SUBROUTINE trackEnergyGain(state, energy_start, energy_end, sympT, freq)
 	USE symplecticInt
