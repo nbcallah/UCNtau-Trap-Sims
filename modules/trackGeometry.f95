@@ -19,19 +19,19 @@ SUBROUTINE randomPointTrap(x,y,z,px,py,pz)
 	DO
 		CALL RANDOM_NUMBER(energy)
 		energy = maxEnergy * energy
-!		IF (energy < GRAV*MASS_N*0.021_8) THEN
-!			CYCLE
-!		END IF
-!		IF (energy > GRAV*MASS_N*0.1_8) THEN
-!			EXIT
-!		END IF
-		IF (energy > GRAV*MASS_N*0.015_8) THEN
+		IF (energy < GRAV*MASS_N*0.021_8) THEN
+			CYCLE
+		END IF
+		IF (energy > GRAV*MASS_N*0.1_8) THEN
 			EXIT
 		END IF
-!		CALL RANDOM_NUMBER(en_reject_val)
-!		IF (en_reject_val < energy/(GRAV*MASS_N)/0.1) THEN
+!		IF (energy > GRAV*MASS_N*0.015_8) THEN
 !			EXIT
 !		END IF
+		CALL RANDOM_NUMBER(en_reject_val)
+		IF (en_reject_val < energy/(GRAV*MASS_N)/0.1) THEN
+			EXIT
+		END IF
 	END DO
 
 	DO
