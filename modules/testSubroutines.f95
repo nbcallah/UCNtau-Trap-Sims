@@ -161,6 +161,72 @@ SUBROUTINE trackDaggerHitTime(state)
 	WRITE(1) hitT, hitE
 END SUBROUTINE trackDaggerHitTime
 
+SUBROUTINE trackDaggerHitTimeFixedEff(state)
+	USE symplecticInt
+	USE constants
+	USE forcesAndPotential
+	IMPLICIT NONE
+	real(kind=PREC), dimension(6), intent(inout) :: state
+	real(kind=PREC), dimension(6) :: prevState
+
+	real(kind=PREC) :: t, fracTravel, predX, predZ, energy, zOff, zeta, hitU
+	real(kind=PREC) :: settlingTime
+
+	integer :: i, numSteps, nHit
+	
+	nHit = 0
+	
+	t = 0.0_8
+	
+	settlingTime = 20.0_8 + 50.0_8
+	
+	numSteps = settlingTime/dt
+	DO i=1,numSteps,1
+		CALL symplecticStep(state, dt, energy)
+		t = t + dt
+	END DO
+	
+	DO
+		prevState = state
+		CALL symplecticStep(state, dt, energy)
+		t = t + dt
+		IF (SIGN(1.0_8, state(2)) .NE. SIGN(1.0_8, prevState(2))) THEN
+			fracTravel = ABS(prevState(2))/(ABS(state(2)) + ABS(prevState(2)))
+			predX = prevState(1) + fracTravel * (state(1) - prevState(1))
+			predZ = prevState(3) + fracTravel * (state(3) - prevState(3))
+			
+			CALL zOffDipCalc(t - settlingTime, zOff)
+			IF (predX > 0.0_8) THEN
+				zeta = 0.5_8 - SQRT(predX**2 + (ABS(predZ - zOff) - 1.0_8)**2)
+			ELSE
+				zeta = 1.0_8 - SQRT(predX**2 + (ABS(predZ - zOff) - 0.5_8)**2)
+			END IF
+			IF (ABS(predX) < .2 .AND. zeta > 0.0_8 .AND. predZ < (-1.5_8 + zOff + 0.2_8)) THEN
+                CALL RANDOM_NUMBER(hitU)
+                IF (hitU < eff) THEN
+                    WRITE(1) t - settlingTime, energy, state(5)*state(5)/(2.0_8*MASS_N)
+                    EXIT
+                END IF
+				IF (prevState(2) > 0 .AND. prevState(5) < 0) THEN
+					CALL reflect(prevState, (/0.0_8, 1.0_8, 0.0_8/), (/0.0_8, 0.0_8, 1.0_8/))
+					state = prevState
+				ELSE IF (prevState(2) < 0 .AND. prevState(5) > 0) THEN
+					CALL reflect(prevState, (/0.0_8, -1.0_8, 0.0_8/), (/0.0_8, 0.0_8, 1.0_8/))
+					state = prevState
+				ELSE
+					PRINT *, "UHOH"
+				END IF
+!				WRITE(1) t - (20.0_8 + 50.0_8), predX, predZ - zOff
+!				EXIT
+			END IF
+			
+			IF (t > 2000) THEN
+				EXIT
+			END IF
+		END IF
+	END DO
+END SUBROUTINE trackDaggerHitTime
+
 SUBROUTINE trackEnergyGain(state, energy_start, energy_end, sympT, freq)
 	USE symplecticInt
 	USE constants
