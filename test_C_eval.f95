@@ -100,7 +100,7 @@ PROGRAM track
 	
 	DO i=trajPerWorker*rank+1,trajPerWorker*(rank+1),1
 !		sympT = 0.0_8
-        CALL trackAndPrint(states(i,:))
+!       CALL trackAndPrint(states(i,:))
 !		CALL trackEnergyGain(states(i,:), energy_start, energy_end, sympT, 30.0_8)
 !		PRINT *, rank, i, energy_start, energy_end
 !		PRINT *, rank, i, (energy_end - energy_start)/energy_start
@@ -108,6 +108,8 @@ PROGRAM track
 
 !		CALL trackDaggerHitTimeFixedEff(states(i, :))
 	END DO
+    
+    CALL trackAndPrint(states(ntraj,:))
 
 !	DO i=1,81,1 !Freq
 !		DO j=0,39,1 !Height
