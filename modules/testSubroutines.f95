@@ -300,7 +300,7 @@ SUBROUTINE trackAndPrint(state, sympT)
 	integer :: i, numSteps, numPoints, modulus
 		
 !	numSteps = 250e0_8/dt
-	numSteps = 1000e0/dt
+	numSteps = 10e0/dt
 	t = 0.0_8
 	totalU = 0.0_8
 	
@@ -309,8 +309,8 @@ SUBROUTINE trackAndPrint(state, sympT)
 	
 	DO i=1,numSteps,1
 !		IF(t > 475.0_8 .AND. t < 480.0_8) THEN
-		IF(INT(dt*10_8*i)-INT(dt*10_8*(i-1)) .NE. 0) THEN
-!		IF(1 .EQ. 1) THEN
+!		IF(INT(dt*10_8*i)-INT(dt*10_8*(i-1)) .NE. 0) THEN
+		IF(1 .EQ. 1) THEN
 !			energy = totalU + SUM(state(1,4:6)**2)/(2.0_8*MASS_N)
 
 			PRINT *, dt*i, state(1), state(2), state(3),&
