@@ -236,28 +236,61 @@ SUBROUTINE trackEnergyGain(state, energy_start, energy_end, sympT, freq)
 	real(kind=PREC), intent(out) :: energy_start, energy_end
 	real(kind=PREC), optional, intent(inout) :: sympT
 	real(kind=PREC), optional, intent(in) :: freq
-    real(kind=PREC) :: eta
-	integer :: i, numSteps, triggered
+    real(kind=PREC) :: eta, prevEta, t, energy, t_end
+	integer :: i, numSteps, triggered, rising
+    
+    t = 0.0_8
+    
+    triggered = 0
+    rising = 0
+    prevEta = 10.0_8
+    eta = 10.0_8
 
 	numSteps = 1000e0/dt
 !	totalU = 0.0_8
 	
-	CALL calcEnergy(state, energy_start)
+!	CALL calcEnergy(state, energy_start)
+    energy_start = 0.0_8
 !	energy = 0.0
 	
 	DO i=1,numSteps,1
 		IF(present(sympT)) THEN
-			CALL symplecticStep(state, dt, energy_end, sympT, freq)
+			CALL symplecticStep(state, dt, energy, sympT, freq)
 		ELSE
-			CALL symplecticStep(state, dt, energy_end)
-			sympT = sympT+dt
+			CALL symplecticStep(state, dt, energy)
+			t = t+dt
 		END IF
-		IF (100.0_8*energy_end/(MASS_N*GRAV) > 38.0_8 + 5.0_8) THEN
+!        IF (triggered .EQ. 0) THEN
+        prevEta = eta
+        IF (state(1) > 0) THEN
+            eta = 1.0_8 - SQRT(state(1)**2 + (SQRT(state(2)**2 + state(3)**2) - 0.5_8)**2)
+        END IF
+        IF (state(1) <= 0) THEN
+            eta = 0.5_8 - SQRT(state(1)**2 + (SQRT(state(2)**2 + state(3)**2) - 1.0_8)**2)
+        END IF
+        IF ((rising .EQ. 0) .AND. (prevEta < eta)) THEN
+            rising = 1
+        END IF
+        IF ((rising .EQ. 1) .AND. (prevEta > eta) .AND. (triggered .EQ. 0)) THEN
+!            PRINT *, t, energy
+            triggered = 1
+            rising = 0
+            energy_start = energy
+        END IF
+        IF ((rising .EQ. 1) .AND. (prevEta > eta) .AND. (triggered .EQ. 1)) THEN
+!            PRINT *, t, energy
+            t_end = t
+            rising = 0
+            energy_end = energy
+        END IF
+!        END IF
+		IF (100.0_8*energy/(MASS_N*GRAV) > 38.0_8 + 5.0_8) THEN
 !			PRINT *, "DEAD"
 			EXIT
 		END IF
 	END DO
 !	PRINT *, energy_start, energy_end
+!	PRINT *, t_end, energy_end
 END SUBROUTINE trackEnergyGain
 
 SUBROUTINE testEnergyGain(freq, height, sympT, eStart, eEnd)
