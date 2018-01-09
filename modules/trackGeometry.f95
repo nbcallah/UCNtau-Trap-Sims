@@ -37,9 +37,9 @@ SUBROUTINE randomPointTrap(x,y,z,px,py,pz)
 	DO
 		z = -1.45_8
 		CALL RANDOM_NUMBER(x)
-		x = x*0.075_8 - 0.15_8
+		x = x*0.15_8 - 0.075_8
 		CALL RANDOM_NUMBER(y)
-		y = y*0.075_8 - 0.15_8
+		y = y*0.15_8 - 0.075_8
 
 		CALL totalPotential(x, y, z, totalU)
 		IF (totalU < energy) THEN
