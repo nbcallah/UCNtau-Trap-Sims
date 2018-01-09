@@ -122,13 +122,6 @@ SUBROUTINE trackDaggerHitTime(state)
 		prevState = state
 		CALL symplecticStep(state, dt, energy)
 		t = t + dt
-!        IF(INT(t*10_8)-INT(10_8*(t-dt)) .NE. 0) THEN
-!		IF(1 .EQ. 1) THEN
-        IF ((nHit .GT. 2) .AND. (nHit .LT. 7)) THEN
-!			PRINT *, t, state(1), state(2), state(3),&
-!			state(4)/MASS_N, state(5)/MASS_N, state(6)/MASS_N, energy,&
-!			0.0_8!, fx, fy, fz
-		END IF
 		IF (SIGN(1.0_8, state(2)) .NE. SIGN(1.0_8, prevState(2))) THEN
 			fracTravel = ABS(prevState(2))/(ABS(state(2)) + ABS(prevState(2)))
 			predX = prevState(1) + fracTravel * (state(1) - prevState(1))
