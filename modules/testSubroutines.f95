@@ -98,8 +98,8 @@ SUBROUTINE trackDaggerHitTime(state)
 
 	real(kind=PREC) :: t, fracTravel, predX, predZ, energy, zOff, zeta
 	real(kind=PREC) :: settlingTime
-	real(kind=PREC), dimension(20) :: hitT
-	real(kind=PREC), dimension(20) :: hitE
+	real(kind=4), dimension(50) :: hitT
+	real(kind=4), dimension(50) :: hitE
 	
 	integer :: i, numSteps, nHit
 	
@@ -137,7 +137,7 @@ SUBROUTINE trackDaggerHitTime(state)
 				nHit = nHit + 1
 				hitT(nHit) = t - settlingTime
 				hitE(nHit) = state(5)*state(5)/(2.0_8*MASS_N)
-				IF (nHit .EQ. 20) THEN
+				IF (nHit .EQ. 50) THEN
 					EXIT
 				END IF
 				IF (prevState(2) > 0 .AND. prevState(5) < 0) THEN
@@ -158,7 +158,7 @@ SUBROUTINE trackDaggerHitTime(state)
 			END IF
 		END IF
 	END DO
-	WRITE(1) hitT, hitE
+	WRITE(1) energy, hitT, hitE
 END SUBROUTINE trackDaggerHitTime
 
 SUBROUTINE trackDaggerHitTimeFixedEff(state)
