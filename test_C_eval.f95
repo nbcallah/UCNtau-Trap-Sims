@@ -102,13 +102,15 @@ PROGRAM track
 !		sympT = 0.0_8
 !       CALL trackAndPrint(states(i,:))
 !		CALL trackEnergyGain(states(i,:), energy_start, energy_end, sympT, 30.0_8)
-		CALL trackEnergyGain(states(i,:), energy_start, energy_end)
-		PRINT *, rank, i, energy_start, energy_end, (energy_end - energy_start)/energy_start
+!		CALL trackEnergyGain(states(i,:), energy_start, energy_end)
+!		PRINT *, rank, i, energy_start, energy_end, (energy_end - energy_start)/energy_start
 !		PRINT *, rank, i, (energy_end - energy_start)/energy_start
-!		CALL trackDaggerHitTime(states(i, :))
+		CALL trackDaggerHitTime(states(i, :))
 
 !		CALL trackDaggerHitTimeFixedEff(states(i, :))
 	END DO
+    
+!    CALL trackDaggerHitTime(states(ntraj, :))
     
 !    CALL trackAndPrint(states(ntraj,:))
 

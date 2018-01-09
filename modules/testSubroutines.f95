@@ -23,17 +23,17 @@ SUBROUTINE zOffDipCalc(t, z)
 	real(kind=PREC), intent(in) :: t
 	real(kind=PREC), intent(out) :: z
 	
-	integer :: nDips = 5
+	integer :: nDips = 10
 	real(kind=PREC) :: speed
-	real(kind=PREC), dimension(5) :: dipHeights
-	real(kind=PREC), dimension(5) :: dipEnds
+	real(kind=PREC), dimension(10) :: dipHeights
+	real(kind=PREC), dimension(10) :: dipEnds
 	
 	integer :: i
 	
-!	dipHeights = (/0.49, 0.380, 0.250, 0.180, 0.140, 0.110, 0.080, 0.060, 0.040, 0.010/)
-	dipHeights = (/0.49_8, 0.380_8, 0.250_8, 0.180_8, 0.01_8/)
-!	dipEnds =     (/0.0,  40.0,  80.0,  100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 300.0/)
-	dipEnds =     (/0.0_8,  40.0_8, 80.0_8,  400.0_8, 500.0_8/)
+	dipHeights = (/0.49, 0.380, 0.250, 0.180, 0.140, 0.110, 0.080, 0.060, 0.040, 0.010/)
+!	dipHeights = (/0.49_8, 0.380_8, 0.250_8, 0.180_8, 0.01_8/)
+	dipEnds =     (/0.0,  40.0,  80.0,  100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 300.0/)
+!	dipEnds =     (/0.0_8,  40.0_8, 80.0_8,  400.0_8, 500.0_8/)
 	
 	IF (t > dipEnds(nDips)) THEN
 		z = 0.01
@@ -110,7 +110,7 @@ SUBROUTINE trackDaggerHitTime(state)
 	
 	t = 0.0_8
 	
-	settlingTime = 20.0_8 + 200.0_8
+	settlingTime = 20.0_8 + 50.0_8
 	
 	numSteps = settlingTime/dt
 	DO i=1,numSteps,1
@@ -122,6 +122,13 @@ SUBROUTINE trackDaggerHitTime(state)
 		prevState = state
 		CALL symplecticStep(state, dt, energy)
 		t = t + dt
+!        IF(INT(t*10_8)-INT(10_8*(t-dt)) .NE. 0) THEN
+!		IF(1 .EQ. 1) THEN
+        IF ((nHit .GT. 2) .AND. (nHit .LT. 7)) THEN
+!			PRINT *, t, state(1), state(2), state(3),&
+!			state(4)/MASS_N, state(5)/MASS_N, state(6)/MASS_N, energy,&
+!			0.0_8!, fx, fy, fz
+		END IF
 		IF (SIGN(1.0_8, state(2)) .NE. SIGN(1.0_8, prevState(2))) THEN
 			fracTravel = ABS(prevState(2))/(ABS(state(2)) + ABS(prevState(2)))
 			predX = prevState(1) + fracTravel * (state(1) - prevState(1))
