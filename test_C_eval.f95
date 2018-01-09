@@ -105,7 +105,8 @@ PROGRAM track
 !		CALL trackEnergyGain(states(i,:), energy_start, energy_end)
 !		PRINT *, rank, i, energy_start, energy_end, (energy_end - energy_start)/energy_start
 !		PRINT *, rank, i, (energy_end - energy_start)/energy_start
-		CALL trackDaggerHitTime(states(i, :))
+!		CALL trackDaggerHitTime(states(i, :))
+		CALL trackMidplaneHit(states(i, :))
 
 !		CALL trackDaggerHitTimeFixedEff(states(i, :))
 	END DO

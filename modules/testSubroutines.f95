@@ -235,7 +235,7 @@ SUBROUTINE trackMidplaneHit(state)
 	real(kind=PREC), dimension(6), intent(inout) :: state
 	real(kind=PREC), dimension(6) :: prevState
 
-	real(kind=PREC) :: t, prevT fracTravel, energy, zOff, zeta
+	real(kind=PREC) :: t, prevT, fracTravel, energy, zOff, zeta
 	real(kind=PREC) :: settlingTime
 	real(kind=PREC), dimension(20) :: hitT
 	real(kind=PREC), dimension(20) :: hitE
@@ -253,10 +253,12 @@ SUBROUTINE trackMidplaneHit(state)
 	
 	numSteps = settlingTime/dt
 	DO i=1,numSteps,1
+        prevState = state
 		CALL symplecticStep(state, dt, energy)
         IF (SIGN(1.0_8, state(2)) .NE. SIGN(1.0_8, prevState(2))) THEN
             fracTravel = ABS(prevState(2))/(ABS(state(2)) + ABS(prevState(2)))
             prevT = t + dt * fracTravel
+        END IF
 		t = t + dt
 	END DO
 	
@@ -267,7 +269,7 @@ SUBROUTINE trackMidplaneHit(state)
 		IF (SIGN(1.0_8, state(2)) .NE. SIGN(1.0_8, prevState(2))) THEN
             !Traversed y=0 plane
 			fracTravel = ABS(prevState(2))/(ABS(state(2)) + ABS(prevState(2)))
-            PRINT *, (t - dt + dt*fracTravel) - prevT
+            PRINT *, (t - dt + dt*fracTravel) - prevT, energy, ABS(state(5))
             prevT = (t - dt + dt*fracTravel)
             nHit = nHit + 1
             IF (nHit .EQ. 20) THEN
