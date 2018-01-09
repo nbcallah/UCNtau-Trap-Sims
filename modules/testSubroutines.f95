@@ -227,6 +227,56 @@ SUBROUTINE trackDaggerHitTimeFixedEff(state)
 	END DO
 END SUBROUTINE trackDaggerHitTimeFixedEff
 
+SUBROUTINE trackMidplaneHit(state)
+	USE symplecticInt
+	USE constants
+	USE forcesAndPotential
+	IMPLICIT NONE
+	real(kind=PREC), dimension(6), intent(inout) :: state
+	real(kind=PREC), dimension(6) :: prevState
+
+	real(kind=PREC) :: t, prevT fracTravel, energy, zOff, zeta
+	real(kind=PREC) :: settlingTime
+	real(kind=PREC), dimension(20) :: hitT
+	real(kind=PREC), dimension(20) :: hitE
+	
+	integer :: i, numSteps, nHit
+	
+	nHit = 0
+		
+	hitT = 0.0_8
+	hitE = 0.0_8
+	
+	t = 0.0_8
+	
+	settlingTime = 20.0_8 + 50.0_8
+	
+	numSteps = settlingTime/dt
+	DO i=1,numSteps,1
+		CALL symplecticStep(state, dt, energy)
+        IF (SIGN(1.0_8, state(2)) .NE. SIGN(1.0_8, prevState(2))) THEN
+            fracTravel = ABS(prevState(2))/(ABS(state(2)) + ABS(prevState(2)))
+            prevT = t + dt * fracTravel
+		t = t + dt
+	END DO
+	
+	DO
+		prevState = state
+		CALL symplecticStep(state, dt, energy)
+		t = t + dt
+		IF (SIGN(1.0_8, state(2)) .NE. SIGN(1.0_8, prevState(2))) THEN
+            !Traversed y=0 plane
+			fracTravel = ABS(prevState(2))/(ABS(state(2)) + ABS(prevState(2)))
+            PRINT *, (t - dt + dt*fracTravel) - prevT
+            prevT = (t - dt + dt*fracTravel)
+            nHit = nHit + 1
+            IF (nHit .EQ. 20) THEN
+                EXIT
+            END IF
+		END IF
+	END DO
+END SUBROUTINE trackMidplaneHit
+
 SUBROUTINE trackEnergyGain(state, energy_start, energy_end, sympT, freq)
 	USE symplecticInt
 	USE constants
