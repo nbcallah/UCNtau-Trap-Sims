@@ -13,7 +13,8 @@ SUBROUTINE randomPointTrap(x,y,z,px,py,pz)
 					target_p, p_reject_val, p_len, en_reject_val
 	real(kind=PREC) :: u1, u2, phi, theta !Used for lambertian generation of track directions
 !	maxEnergy = GRAV*MASS_N*0.38_8 !Assume cleaning height of 38cm
-	maxEnergy = GRAV*MASS_N*0.345_8 !Assume cleaning height of 38cm
+	maxEnergy = GRAV*MASS_N*0.345_8 !Assume cleaning height of 38cm - 3.5cm to the zero energy point
+    !A UCN of energy 34.5cm can reach 38cm w.r.t. the bottom of the trap.
 	max_p = SQRT(2.0_8*MASS_N*maxEnergy)
 	
 	DO
