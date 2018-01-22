@@ -110,7 +110,7 @@ SUBROUTINE trackDaggerHitTime(state)
 	
 	t = 0.0_8
 	
-	settlingTime = 20.0_8 + 50.0_8
+	settlingTime = 20.0_8 + 200.0_8
 	
 	numSteps = settlingTime/dt
 	DO i=1,numSteps,1
