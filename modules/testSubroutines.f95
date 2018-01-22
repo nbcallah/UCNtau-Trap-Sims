@@ -23,16 +23,18 @@ SUBROUTINE zOffDipCalc(t, z)
 	real(kind=PREC), intent(in) :: t
 	real(kind=PREC), intent(out) :: z
 	
-	integer :: nDips = 10
+	integer :: nDips = 4
 	real(kind=PREC) :: speed
-	real(kind=PREC), dimension(10) :: dipHeights
-	real(kind=PREC), dimension(10) :: dipEnds
+	real(kind=PREC), dimension(4) :: dipHeights
+	real(kind=PREC), dimension(4) :: dipEnds
 	
 	integer :: i
 	
-	dipHeights = (/0.49, 0.380, 0.250, 0.180, 0.140, 0.110, 0.080, 0.060, 0.040, 0.010/)
+!	dipHeights = (/0.49, 0.380, 0.250, 0.180, 0.140, 0.110, 0.080, 0.060, 0.040, 0.010/) !9 dip
+	dipHeights = (/0.49, 0.380, 0.250, 0.010/) !3 dip
 !	dipHeights = (/0.49_8, 0.380_8, 0.250_8, 0.180_8, 0.01_8/)
-	dipEnds =     (/0.0,  40.0,  80.0,  100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 300.0/)
+!	dipEnds =     (/0.0,  40.0,  80.0,  100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 300.0/) !9 dip
+	dipEnds =     (/0.0,  20.0,  40.0,  140.0/) !3 dip
 !	dipEnds =     (/0.0_8,  40.0_8, 80.0_8,  400.0_8, 500.0_8/)
 	
 	IF (t > dipEnds(nDips)) THEN
@@ -110,7 +112,7 @@ SUBROUTINE trackDaggerHitTime(state)
 	
 	t = 0.0_8
 	
-	settlingTime = 20.0_8 + 200.0_8
+	settlingTime = 20.0_8 + 50.0_8
 	
 	numSteps = settlingTime/dt
 	DO i=1,numSteps,1
