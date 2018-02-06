@@ -31,11 +31,11 @@ SUBROUTINE zOffDipCalc(t, z)
 	integer :: i
 	
 !	dipHeights = (/0.49, 0.380, 0.250, 0.180, 0.140, 0.110, 0.080, 0.060, 0.040, 0.010/) !9 dip
-!	dipHeights = (/0.49, 0.380, 0.250, 0.010/) !3 dip
-	dipHeights = (/0.49_8, 0.380_8, 0.250_8, 0.01_8/)
+	dipHeights = (/0.49, 0.380, 0.250, 0.010/) !3 dip
+!	dipHeights = (/0.49_8, 0.380_8, 0.250_8, 0.01_8/)
 !	dipEnds =     (/0.0,  40.0,  80.0,  100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 300.0/) !9 dip
-!	dipEnds =     (/0.0,  20.0,  40.0,  140.0/) !3 dip
-	dipEnds =     (/0.0_8,  40.0_8,  400.0_8, 500.0_8/)
+	dipEnds =     (/0.0,  20.0,  40.0,  140.0/) !3 dip
+!	dipEnds =     (/0.0_8,  40.0_8,  400.0_8, 500.0_8/)
 	
 	IF (t > dipEnds(nDips)) THEN
 		z = 0.01
@@ -98,7 +98,7 @@ SUBROUTINE trackDaggerHitTime(state)
 	real(kind=PREC), dimension(6), intent(inout) :: state
 	real(kind=PREC), dimension(6) :: prevState
 
-	real(kind=PREC) :: t, fracTravel, predX, predZ, energy, zOff, zeta
+	real(kind=PREC) :: t, fracTravel, predX, predZ, energy, zOff, zeta, nextzOff
 	real(kind=PREC) :: settlingTime
 	real(kind=4), dimension(50) :: hitT
 	real(kind=4), dimension(50) :: hitE
@@ -124,6 +124,26 @@ SUBROUTINE trackDaggerHitTime(state)
 		prevState = state
 		CALL symplecticStep(state, dt, energy)
 		t = t + dt
+        IF (ABS(state(2)) < 0.02) THEN
+            CALL zOffDipCalc(t - settlingTime, zOff)
+            CALL zOffDipCalc(t - settlingTime+dt, nextzOff)
+            IF (zOff .NE. nextzOff) THEN
+                IF (state(1) > 0.0_8) THEN
+                    zeta = 0.5_8 - SQRT(state(1)**2 + (ABS(state(3) - zOff) - 1.0_8)**2)
+                ELSE
+                    zeta = 1.0_8 - SQRT(state(1)**2 + (ABS(state(1) - zOff) - 0.5_8)**2)
+                END IF
+                IF (ABS(state(2)) < 0.01 .AND. ABS(state(1)) < 0.2 &
+                    .AND. zeta < 0 .AND. zeta > -dt*0.49/13.0) THEN
+                    PRINT *, "HIT BOT"
+                END IF
+                IF (ABS(state(1)) < 0.2 .AND. state(3) > (-1.5_8 + zOff + 0.2_8 - dt*0.49/13.0) &
+                    .AND. state(3) < (-1.5_8 + zOff + 0.2_8))THEN
+!                    .AND. ((state(3)+1.5) - zOff - 0.20) > -dt*0.49/13.0) THEN
+                    PRINT *, "HIT HOUSE"
+                END IF
+            END IF
+        END IF
 		IF (SIGN(1.0_8, state(2)) .NE. SIGN(1.0_8, prevState(2))) THEN
 			fracTravel = ABS(prevState(2))/(ABS(state(2)) + ABS(prevState(2)))
 			predX = prevState(1) + fracTravel * (state(1) - prevState(1))
