@@ -49,4 +49,4 @@ modules/fields_nate.o: modules/fields_nate.c include/fields_nate.h
 clean:
 	find . -type f -name '*.o' -delete
 	find . -type f -name '*.mod' -delete
-	rm test_C_eval
+	rm -rf test_C_eval find_min find_min.o

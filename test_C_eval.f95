@@ -50,7 +50,8 @@ PROGRAM track
 	trajPerWorker = ntraj/size
 	
 !	minU = -2.4283243003838247e-26_8
-	minU = -2.390245661413933e-26_8
+	minU = -2.390245661413933e-26_8 !For lambda = 0.0508, brem=1.4
+	minU = -2.390352484438862e-26_8 !For lambda = 0.05114, brem=1.35
 	
 	allocate(states(ntraj,6))
 		

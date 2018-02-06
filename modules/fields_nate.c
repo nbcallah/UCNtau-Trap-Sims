@@ -3,10 +3,12 @@
 #include <stdio.h>
 
 #define B_HOLD 0.005 //holding field strength
-#define B_REM 1.4 //remnant magnet field strength
+//#define B_REM 1.4 //remnant magnet field strength
+#define B_REM 1.35 //remnant magnet field strength
 #define MAG_THICK 0.0254 //thickness of layer of PM array
 //#define MAG_SPACE 0.02 //characteristic spacing of magnets
-#define MAG_SPACE 0.0508 //characteristic spacing of magnets
+//#define MAG_SPACE 0.0508 //characteristic spacing of magnets
+#define MAG_SPACE 0.05114 //characteristic spacing of magnets
 //#define mu -9.662364e-27/1.674927351e-27 //mu in units where m=1
 #define MU_N -9.6623647e-27
 #define MASS_N 1.674927471e-27
