@@ -23,19 +23,19 @@ SUBROUTINE zOffDipCalc(t, z)
 	real(kind=PREC), intent(in) :: t
 	real(kind=PREC), intent(out) :: z
 	
-	integer :: nDips = 4
+	integer :: nDips = 10
 	real(kind=PREC) :: speed
-	real(kind=PREC), dimension(4) :: dipHeights
-	real(kind=PREC), dimension(4) :: dipEnds
+	real(kind=PREC), dimension(10) :: dipHeights
+	real(kind=PREC), dimension(10) :: dipEnds
 	
 	integer :: i
 	
-!	dipHeights = (/0.49, 0.380, 0.250, 0.180, 0.140, 0.110, 0.080, 0.060, 0.040, 0.010/) !9 dip
+	dipHeights = (/0.49, 0.380, 0.250, 0.180, 0.140, 0.110, 0.080, 0.060, 0.040, 0.010/) !9 dip
 !	dipHeights = (/0.49, 0.380, 0.250, 0.010/) !3 dip
-	dipHeights = (/0.49_8, 0.380_8, 0.250_8, 0.01_8/)
-!	dipEnds =     (/0.0,  40.0,  80.0,  100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 300.0/) !9 dip
+!	dipHeights = (/0.49_8, 0.380_8, 0.250_8, 0.01_8/)
+	dipEnds =     (/0.0,  40.0,  80.0,  100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 300.0/) !9 dip
 !	dipEnds =     (/0.0,  20.0,  40.0,  140.0/) !3 dip
-	dipEnds =     (/0.0_8,  40.0_8,  400.0_8, 500.0_8/)
+!	dipEnds =     (/0.0_8,  40.0_8,  400.0_8, 500.0_8/)
 	
 	IF (t > dipEnds(nDips)) THEN
 		z = 0.01
@@ -135,7 +135,9 @@ SUBROUTINE trackDaggerHitTime(state)
 			ELSE
 				zeta = 1.0_8 - SQRT(predX**2 + (ABS(predZ - zOff) - 0.5_8)**2)
 			END IF
-			IF (ABS(predX) < .2 .AND. zeta > 0.0_8 .AND. predZ < (-1.5_8 + zOff + 0.2_8)) THEN
+			IF (ABS(predX) < .2 .AND. zeta > 0.0_8 .AND. predZ < (-1.5_8 + zOff + 0.2_8)) THEN ! Symm. over TD
+            !TD offset from central axis: 6" ~0.1524m
+!			IF (predX > -0.3524_8 .AND. predX < 0.0476_8 .AND. zeta > 0.0_8 .AND. predZ < (-1.5_8 + zOff + 0.2_8)) THEN
 				nHit = nHit + 1
 				hitT(nHit) = t - settlingTime
 				hitE(nHit) = state(5)*state(5)/(2.0_8*MASS_N)
@@ -335,7 +337,7 @@ SUBROUTINE trackAndPrint(state, sympT)
 	integer :: i, numSteps, numPoints, modulus
 		
 !	numSteps = 250e0_8/dt
-	numSteps = 1000e0/dt
+	numSteps = 10e0/dt
 	t = 0.0_8
 	totalU = 0.0_8
 	
@@ -344,8 +346,8 @@ SUBROUTINE trackAndPrint(state, sympT)
 	
 	DO i=1,numSteps,1
 !		IF(t > 475.0_8 .AND. t < 480.0_8) THEN
-		IF(INT(dt*10_8*i)-INT(dt*10_8*(i-1)) .NE. 0) THEN
-!		IF(1 .EQ. 1) THEN
+!		IF(INT(dt*10_8*i)-INT(dt*10_8*(i-1)) .NE. 0) THEN
+		IF(1 .EQ. 1) THEN
 !			energy = totalU + SUM(state(1,4:6)**2)/(2.0_8*MASS_N)
 
 			PRINT *, dt*i, state(1), state(2), state(3),&

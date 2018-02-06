@@ -12,3 +12,4 @@ find_min
 *.DS_Store
 *results/
 *.bin*
+trajectories/*
