@@ -50,14 +50,25 @@ SUBROUTINE randomPointTrap(x,y,z,px,py,pz)
         
     target_p = SQRT(2.0_8*MASS_N*(energy - totalU))
 
+!    !cos(theta)*sin(theta) distribution
+!    CALL RANDOM_NUMBER(u1)
+!    CALL RANDOM_NUMBER(u2)
+!    theta = ASIN(SQRT(u1))
+!    phi = 2.0_8 * PI * u2
+!
+!    px = SIN(theta)*COS(phi)
+!    py = SIN(theta)*SIN(phi)
+!    pz = COS(theta)
+
+    !Isotropic emission
     CALL RANDOM_NUMBER(u1)
     CALL RANDOM_NUMBER(u2)
-    theta = ASIN(SQRT(u1))
+    u1 = u1 * 2 - 1.0_8
     phi = 2.0_8 * PI * u2
 
-    px = SIN(theta)*COS(phi)
-    py = SIN(theta)*SIN(phi)
-    pz = COS(theta)
+    px = SQRT(1-u1*u1)*COS(phi)
+    py = SQRT(1-u1*u1)*SIN(phi)
+    pz = u1
 
     p_len = SQRT(px*px + py*py + pz*pz)
 
