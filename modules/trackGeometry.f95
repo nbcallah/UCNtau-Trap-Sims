@@ -36,7 +36,7 @@ SUBROUTINE randomPointTrap(x,y,z,px,py,pz)
     END DO
 
     DO
-        z = -1.45_8
+        z = -1.464413669130002_8
         CALL RANDOM_NUMBER(x)
         x = x*0.15_8 - 0.075_8
         CALL RANDOM_NUMBER(y)
@@ -64,6 +64,7 @@ SUBROUTINE randomPointTrap(x,y,z,px,py,pz)
     px = (target_p/p_len)*px
     py = (target_p/p_len)*py
     pz = (target_p/p_len)*pz
+!    PRINT *, x, y, z, px, py, pz, (px*px + py*py + pz*pz)/(2.0_8*MASS_N), totalU, theta
 END SUBROUTINE randomPointTrap
 !
 !SUBROUTINE randomPointTrap(x, y, z, px, py, pz)
