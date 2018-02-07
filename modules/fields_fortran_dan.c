@@ -73,8 +73,8 @@ void force_dan_(double *x_in, double *y_in, double *z_in, double *fx, double *fy
         }
 
         gz -= grav_dan*m_n_dan;
-	
-		*totalU = -mu_dan*B_tot+grav_dan*m_n_dan*z;
+    
+        *totalU = -mu_dan*B_tot+grav_dan*m_n_dan*z;
 
         *fx = gx;
         *fy = gy;
