@@ -96,7 +96,9 @@ PROGRAM track
 !    END DO
         
     DO i=1,ntraj,1
-        CALL randomPointTrap(states(i,1), states(i,2), states(i,3), states(i,4), states(i,5), states(i,6))
+!        CALL randomPointTrap(states(i,1), states(i,2), states(i,3), states(i,4), states(i,5), states(i,6))
+        CALL randomPointTrapOptimum(states(i,1), states(i,2), states(i,3),&
+            states(i,4), states(i,5), states(i,6))
     END DO
     
     DO i=trajPerWorker*rank+1,trajPerWorker*(rank+1),1
@@ -106,9 +108,9 @@ PROGRAM track
 !        CALL trackEnergyGain(states(i,:), energy_start, energy_end)
 !        PRINT *, rank, i, energy_start, energy_end, (energy_end - energy_start)/energy_start
 !        PRINT *, rank, i, (energy_end - energy_start)/energy_start
-        CALL trackDaggerHitTime(states(i, :))
+!        CALL trackDaggerHitTime(states(i, :))
+        CALL fixedEffDaggerHitTime(states(i, :))
 
-!        CALL trackDaggerHitTimeFixedEff(states(i, :))
     END DO
     
 !    CALL trackDaggerHitTime(states(ntraj, :))
