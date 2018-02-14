@@ -164,7 +164,7 @@ SUBROUTINE absorb(ePerp, prob)
         mbar = MATMUL(mbar, m(wavenum(ePerp_c, pots(i)), wavenum(ePerp_c, pots(i-1)), zs(i-1)))
     END DO
     
-    prob = 1.0_8 - REALPART(CONJG(-mbar(2,1)/mbar(2,2))*-mbar(2,1)/mbar(2,2))
+    prob = 1.0_8 - REALPART(CONJG(-mbar(2,1)/mbar(2,2))*(-mbar(2,1)/mbar(2,2)))
 END SUBROUTINE absorb
 !double absorbProbQuantOxide(double ePerp, double thickOxide, double thickBoron) {
 !    const double voxide = (2*M_PI*(HBAR*HBAR)/MASS_N)*ABORON*NBORONB2O3 + (2*M_PI*(HBAR*HBAR)/MASS_N)*AOXYGEN*NOXYGENB2O3;
