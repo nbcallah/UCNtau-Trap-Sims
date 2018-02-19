@@ -109,9 +109,15 @@ PROGRAM track
 !        PRINT *, rank, i, energy_start, energy_end, (energy_end - energy_start)/energy_start
 !        PRINT *, rank, i, (energy_end - energy_start)/energy_start
 !        CALL trackDaggerHitTime(states(i, :))
+
         CALL fixedEffDaggerHitTime(states(i, :))
 
     END DO
+    
+!    DO i = 0,1000,1
+!        CALL zOffDipCalc(i*1.0_8, z)
+!        PRINT *, i, z
+!    END DO
     
 !    CALL trackDaggerHitTime(states(ntraj, :))
     
