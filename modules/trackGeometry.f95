@@ -93,12 +93,14 @@ SUBROUTINE randomPointTrapOptimum(x,y,z,px,py,pz)
     DO
         CALL RANDOM_NUMBER(energy)
         energy = maxEnergy * energy
-        IF (energy < 11.7/JTONEV) THEN
+!        IF (energy < 11.7/JTONEV) THEN
+        IF (energy < 11.641026_8/JTONEV) THEN
             CYCLE
         END IF
         
-        CALL RANDOM_NUMBER(en_reject_val)
-        IF (en_reject_val < energy/maxEnergy) THEN
+!        CALL RANDOM_NUMBER(en_reject_val)
+!        IF (en_reject_val < energy/maxEnergy) THEN
+        IF (en_reject_val < (energy/maxEnergy)**1.076923_8) THEN
             EXIT
         END IF
     END DO
