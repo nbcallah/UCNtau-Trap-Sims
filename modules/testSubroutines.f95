@@ -304,12 +304,14 @@ SUBROUTINE fixedEffDaggerHitTime(state)
     real(kind=PREC), dimension(6), intent(inout) :: state
     real(kind=PREC), dimension(6) :: prevState
 
-    real(kind=PREC) :: t, fracTravel, predX, predZ, energy, zOff, zeta
+    real(kind=PREC) :: t, fracTravel, predX, predZ, energy, zOff, zeta, theta
     real(kind=PREC) :: settlingTime
     
     real(kind=PREC) :: absProb, absU, deathTime
     
     integer :: i, numSteps, nHit, nHitHouseLow, nHitHouseHigh
+    
+    theta = ACOS(state(6)/SQRT(state(4)**2 + state(5)**2 + state(6)**2))
     
     t = 0.0_8
     nHit = 0
@@ -349,7 +351,7 @@ SUBROUTINE fixedEffDaggerHitTime(state)
                 CALL absorb(state(5)*state(5)/(2.0_8*MASS_N), absProb)
                 CALL RANDOM_NUMBER(absU)
                 IF (absU < absProb) THEN
-                    WRITE(1) energy, t-settlingTime, state(5)*state(5)/(2.0_8*MASS_N), &
+                    WRITE(1) energy, theta, t-settlingTime, state(5)*state(5)/(2.0_8*MASS_N), &
                         predX, 0.0_8, predZ, zOff, nHit, nHitHouseLow, nHitHouseHigh
                     EXIT
                 END IF
