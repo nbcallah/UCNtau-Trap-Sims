@@ -68,7 +68,7 @@ SUBROUTINE randomPointTrap(x,y,z,px,py,pz)
 
     px = SQRT(1-u1*u1)*COS(phi)
     py = SQRT(1-u1*u1)*SIN(phi)
-    pz = u1
+    pz = ABS(u1)
 
     p_len = SQRT(px*px + py*py + pz*pz)
 
