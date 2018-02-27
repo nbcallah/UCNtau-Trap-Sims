@@ -23,25 +23,28 @@ SUBROUTINE zOffDipCalc(t, z)
     real(kind=PREC), intent(in) :: t
     real(kind=PREC), intent(out) :: z
     
-    integer :: nDips = 4
+    integer :: nDips = 12
     real(kind=PREC) :: speed
-    real(kind=PREC), dimension(4) :: dipHeights
-    real(kind=PREC), dimension(4) :: dipEnds
+    real(kind=PREC), dimension(12) :: dipHeights
+    real(kind=PREC), dimension(12) :: dipEnds
     real(kind=PREC) :: holdT
     
     integer :: i
     
-    holdT = 900
+    holdT = 20
     
 !    dipHeights = (/0.49, 0.380, 0.250, 0.180, 0.140, 0.110, 0.080, 0.060, 0.040, 0.010/) !9 dip
-!    dipHeights = (/0.49, 0.250, 0.49, 0.380, 0.250, 0.180, 0.140, 0.110, 0.080, 0.060, 0.040, 0.010/) !9 dip PSE
-    dipHeights = (/0.49, 0.380, 0.250, 0.010/) !3 dip
-!    dipHeights = (/0.49_8, 0.380_8, 0.250_8, 0.01_8/)
 !    dipEnds =     (/0.0,  40.0,  80.0,  100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 300.0/) !9 dip
-!    dipEnds =     (/0.0_8,  200.0_8,  200.0+holdT, 200.0+holdT+20.0, 200.0+holdT+40.0, 200.0+holdT+50.0, &
-!                    200.0+holdT+60.0, 200.0+holdT+70.0, 200.0+holdT+80.0, 200.0+holdT+90.0, &
-!                    200.0+holdT+100.0, 200.0+holdT+120.0/) !9 dip PSE
-    dipEnds =     (/0.0,  20.0,  40.0,  140.0/) !3 dip
+
+!    dipHeights = (/0.49, 0.380, 0.250, 0.010/) !3 dip
+!    dipEnds =     (/0.0,  20.0,  40.0,  140.0/) !3 dip
+
+    dipHeights = (/0.49, 0.250, 0.49, 0.380, 0.250, 0.180, 0.140, 0.110, 0.080, 0.060, 0.040, 0.010/) !9 dip PSE
+    dipEnds =     (/0.0_8,  200.0_8,  200.0+holdT, 200.0+holdT+20.0, 200.0+holdT+40.0, 200.0+holdT+50.0, &
+                    200.0+holdT+60.0, 200.0+holdT+70.0, 200.0+holdT+80.0, 200.0+holdT+90.0, &
+                    200.0+holdT+100.0, 200.0+holdT+120.0/) !9 dip PSE
+
+!    dipHeights = (/0.49_8, 0.380_8, 0.250_8, 0.01_8/)
 !    dipEnds =     (/0.0_8,  40.0_8,  400.0_8, 500.0_8/)
     
     IF (t > dipEnds(nDips)) THEN
@@ -318,8 +321,9 @@ SUBROUTINE fixedEffDaggerHitTime(state)
     nHitHouseLow = 0
     nHitHouseHigh = 0
     
-    settlingTime = 20.0_8 + 200.0_8
+    !settlingTime = 20.0_8 + 200.0_8
     !settlingTime = 50.0_8
+    settlingTime = 0.0_8
     
     CALL RANDOM_NUMBER(deathTime)
     deathTime = -877.7*LOG(deathTime)
