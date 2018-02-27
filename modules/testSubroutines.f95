@@ -318,8 +318,8 @@ SUBROUTINE fixedEffDaggerHitTime(state)
     nHitHouseLow = 0
     nHitHouseHigh = 0
     
-    !settlingTime = 20.0_8 + 200.0_8
-    settlingTime = 50.0_8
+    settlingTime = 20.0_8 + 200.0_8
+    !settlingTime = 50.0_8
     
     CALL RANDOM_NUMBER(deathTime)
     deathTime = -877.7*LOG(deathTime)
