@@ -59,16 +59,29 @@ SUBROUTINE randomPointTrap(x,y,z,px,py,pz)
 !    px = SIN(theta)*COS(phi)
 !    py = SIN(theta)*SIN(phi)
 !    pz = COS(theta)
+!    !cos(theta)*sin(theta) distribution
 
     !Isotropic emission
+!    CALL RANDOM_NUMBER(u1)
+!    CALL RANDOM_NUMBER(u2)
+!    u1 = u1 * 2 - 1.0_8
+!    phi = 2.0_8 * PI * u2
+
+!    px = SQRT(1-u1*u1)*COS(phi)
+!    py = SQRT(1-u1*u1)*SIN(phi)
+!    pz = ABS(u1)
+    !Isotropic emission
+
+    !Flat in theta emission
     CALL RANDOM_NUMBER(u1)
     CALL RANDOM_NUMBER(u2)
-    u1 = u1 * 2 - 1.0_8
+    theta = u1 * PI / 2.0_8
     phi = 2.0_8 * PI * u2
 
-    px = SQRT(1-u1*u1)*COS(phi)
-    py = SQRT(1-u1*u1)*SIN(phi)
-    pz = ABS(u1)
+    px = SIN(theta)*COS(phi)
+    py = SIN(theta)*SIN(phi)
+    pz = COS(theta)
+    !Flat in theta emission
 
     p_len = SQRT(px*px + py*py + pz*pz)
 
