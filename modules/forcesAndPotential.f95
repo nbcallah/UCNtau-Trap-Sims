@@ -12,9 +12,9 @@ SUBROUTINE totalPotential(x, y, z, totalU, t)
     real(kind=PREC), optional, intent(in) :: t
     
     IF(PRESENT(t)) THEN
-        CALL potential(x, y, z, totalU, t)
+        CALL potential(x, y, z, totalU, t, 0.0)
     ELSE
-        CALL potential(x, y, z, totalU)
+        CALL potential(x, y, z, totalU, 0.0, 0.0)
     END IF
     totalU = totalU - minU
 END SUBROUTINE totalPotential
