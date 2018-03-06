@@ -96,9 +96,9 @@ PROGRAM track
 !    END DO
         
     DO i=1,ntraj,1
-        CALL randomPointTrap(states(i,1), states(i,2), states(i,3), states(i,4), states(i,5), states(i,6))
-!        CALL randomPointTrapOptimum(states(i,1), states(i,2), states(i,3),&
-!            states(i,4), states(i,5), states(i,6))
+!        CALL randomPointTrap(states(i,1), states(i,2), states(i,3), states(i,4), states(i,5), states(i,6))
+        CALL randomPointTrapOptimum(states(i,1), states(i,2), states(i,3),&
+            states(i,4), states(i,5), states(i,6))
     END DO
     
     DO i=trajPerWorker*rank+1,trajPerWorker*(rank+1),1
