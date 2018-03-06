@@ -84,7 +84,9 @@ PROGRAM track
         CALL EXIT(0)
     END IF
     !I'm not going to care about proper types since it's just for seed values
-    rngSeed(1) = 4434
+!    rngSeed(1) = -2015418360
+    rngSeed(1) = -392767427
+!    rngSeed(1) = 4434
     DO i=2,seedLen,1
         rngSeed(i) = MOD((48271*rngSeed(i-1)), 2147483647)
     END DO
