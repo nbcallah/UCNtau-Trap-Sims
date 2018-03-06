@@ -84,8 +84,8 @@ PROGRAM track
         CALL EXIT(0)
     END IF
     !I'm not going to care about proper types since it's just for seed values
-!    rngSeed(1) = -2015418360
-    rngSeed(1) = -392767427
+    rngSeed(1) = -2015418360
+!    rngSeed(1) = -392767427
 !    rngSeed(1) = 4434
     DO i=2,seedLen,1
         rngSeed(i) = MOD((48271*rngSeed(i-1)), 2147483647)
@@ -98,9 +98,9 @@ PROGRAM track
 !    END DO
         
     DO i=1,ntraj,1
-!        CALL randomPointTrap(states(i,1), states(i,2), states(i,3), states(i,4), states(i,5), states(i,6))
-        CALL randomPointTrapOptimum(states(i,1), states(i,2), states(i,3),&
-            states(i,4), states(i,5), states(i,6))
+        CALL randomPointTrap(states(i,1), states(i,2), states(i,3), states(i,4), states(i,5), states(i,6))
+!        CALL randomPointTrapOptimum(states(i,1), states(i,2), states(i,3),&
+!            states(i,4), states(i,5), states(i,6))
     END DO
     
     DO i=trajPerWorker*rank+1,trajPerWorker*(rank+1),1
