@@ -86,10 +86,18 @@ PROGRAM track
     !I'm not going to care about proper types since it's just for seed values
     rngSeed(1) = -2015418360
 !    rngSeed(1) = -392767427
+    rngSeed = (/-1945520552, 519016354, -404253796, 1561684179,&
+                -1722369288, -492083488, -1625858952, 1054014135,&
+                2043038395, 880511665, -981405493, -1547842263,&
+                -1112416185, 1800698465, -116679498, -1701772841,&
+                -754606736, -201409009, -736179651, 473055375,&
+                -1274105917, 1798798780, 606230487, -106513495,&
+                700856297, 1350392983, -618623404, 977451019,&
+                526790775, 2063245412, 178787983, 1953263558/)
 !    rngSeed(1) = 4434
-    DO i=2,seedLen,1
-        rngSeed(i) = MOD((48271*rngSeed(i-1)), 2147483647)
-    END DO
+!    DO i=2,seedLen,1
+!        rngSeed(i) = MOD((48271*rngSeed(i-1)), 2147483647)
+!    END DO
     CALL RANDOM_SEED(put=rngSeed(1:seedLen))
     
 !    DO i=1,100,1
@@ -110,9 +118,9 @@ PROGRAM track
 !        CALL trackEnergyGain(states(i,:), energy_start, energy_end)
 !        PRINT *, rank, i, energy_start, energy_end, (energy_end - energy_start)/energy_start
 !        PRINT *, rank, i, (energy_end - energy_start)/energy_start
-!        CALL trackDaggerHitTime(states(i, :))
+        CALL trackDaggerHitTime(states(i, :))
 
-        CALL fixedEffDaggerHitTime(states(i, :))
+!        CALL fixedEffDaggerHitTime(states(i, :))
 
     END DO
     

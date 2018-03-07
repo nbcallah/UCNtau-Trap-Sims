@@ -209,7 +209,7 @@ SUBROUTINE trackDaggerHitTime(state)
     real(kind=PREC), dimension(6), intent(inout) :: state
     real(kind=PREC), dimension(6) :: prevState
 
-    real(kind=PREC) :: t, fracTravel, predX, predZ, energy, zOff, zeta
+    real(kind=PREC) :: t, fracTravel, predX, predZ, energy, zOff, zeta, theta
     real(kind=PREC) :: settlingTime
     real(kind=4), dimension(50) :: hitT
     real(kind=4), dimension(50) :: hitE
@@ -224,7 +224,10 @@ SUBROUTINE trackDaggerHitTime(state)
     t = 0.0_8
     
     !settlingTime = 20.0_8 + 200.0_8
-    settlingTime = 20.0_8 + 50.0_8
+    !settlingTime = 20.0_8 + 50.0_8
+    settlingTime = 150.0_8
+
+    theta = ACOS(state(6)/SQRT(state(4)**2 + state(5)**2 + state(6)**2))
     
     numSteps = settlingTime/dt
     DO i=1,numSteps,1
@@ -297,7 +300,7 @@ SUBROUTINE trackDaggerHitTime(state)
             END IF
         END IF
     END DO
-    WRITE(1) energy, hitT, hitE
+    WRITE(1) energy, theta, hitT, hitE
 END SUBROUTINE trackDaggerHitTime
 
 SUBROUTINE fixedEffDaggerHitTime(state)
