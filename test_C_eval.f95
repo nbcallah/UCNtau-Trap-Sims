@@ -16,7 +16,7 @@ PROGRAM track
     character(len=256) :: fName
     character(len=256) :: rankString
     integer :: i, j, k
-    integer :: seedLen
+    integer :: seedLen, seedOff
     integer, dimension(32) :: rngSeed
     integer :: rank, size, tag, next, from, ierr, workerIt, trajPerWorker
     integer :: ntraj
@@ -79,12 +79,13 @@ PROGRAM track
 !    b(4)=b(2)
 
     CALL RANDOM_SEED(size=seedLen)
-    IF (seedLen > 32) THEN
+    seedOff = 0
+    IF (seedLen + seedOff > 32) THEN
         PRINT *, "Error! The requested length of seed is too long"
         CALL EXIT(0)
     END IF
     !I'm not going to care about proper types since it's just for seed values
-    rngSeed(1) = -2015418360
+!    rngSeed(1) = -2015418360
 !    rngSeed(1) = -392767427
     rngSeed = (/-1945520552, 519016354, -404253796, 1561684179,&
                 -1722369288, -492083488, -1625858952, 1054014135,&
@@ -98,7 +99,7 @@ PROGRAM track
 !    DO i=2,seedLen,1
 !        rngSeed(i) = MOD((48271*rngSeed(i-1)), 2147483647)
 !    END DO
-    CALL RANDOM_SEED(put=rngSeed(1:seedLen))
+    CALL RANDOM_SEED(put=rngSeed(1+seedOff:seedLen+seedOff))
     
 !    DO i=1,100,1
 !        CALL zOffDipCalc(i*(250.0_8/100.0_8), z)
