@@ -48,9 +48,7 @@ PROGRAM track
     OPEN(UNIT=1,FILE=fName, FORM='UNFORMATTED')
     
     trajPerWorker = ntraj/size
-    
-!    minU = -2.4283243003838247e-26_8
-    minU = -2.390245661413933e-26_8 !For lambda = 0.0508, brem=1.4
+
     minU = -2.390352484438862e-26_8 !For lambda = 0.05114, brem=1.35
     
     allocate(states(ntraj,6))
@@ -84,9 +82,6 @@ PROGRAM track
         PRINT *, "Error! The requested length of seed is too long"
         CALL EXIT(0)
     END IF
-    !I'm not going to care about proper types since it's just for seed values
-!    rngSeed(1) = -2015418360
-!    rngSeed(1) = -392767427
     rngSeed = (/-1945520552, 519016354, -404253796, 1561684179,&
                 -1722369288, -492083488, -1625858952, 1054014135,&
                 2043038395, 880511665, -981405493, -1547842263,&
@@ -95,66 +90,21 @@ PROGRAM track
                 -1274105917, 1798798780, 606230487, -106513495,&
                 700856297, 1350392983, -618623404, 977451019,&
                 526790775, 2063245412, 178787983, 1953263558/)
-!    rngSeed(1) = 4434
-!    DO i=2,seedLen,1
-!        rngSeed(i) = MOD((48271*rngSeed(i-1)), 2147483647)
-!    END DO
     CALL RANDOM_SEED(put=rngSeed(1+seedOff:seedLen+seedOff))
-    
-!    DO i=1,100,1
-!        CALL zOffDipCalc(i*(250.0_8/100.0_8), z)
-!        PRINT *, z, i*(250.0_8/100.0_8)
-!    END DO
         
     DO i=1,ntraj,1
-        CALL randomPointTrap(states(i,1), states(i,2), states(i,3), states(i,4), states(i,5), states(i,6))
-!        CALL randomPointTrapOptimum(states(i,1), states(i,2), states(i,3),&
-!            states(i,4), states(i,5), states(i,6))
+        CALL randomPointTrapOptimum(states(i,1), states(i,2), states(i,3),&
+            states(i,4), states(i,5), states(i,6))
     END DO
     
     DO i=trajPerWorker*rank+1,trajPerWorker*(rank+1),1
-!        sympT = 0.0_8
-!       CALL trackAndPrint(states(i,:))
-!        CALL trackEnergyGain(states(i,:), energy_start, energy_end, sympT, 30.0_8)
-!        CALL trackEnergyGain(states(i,:), energy_start, energy_end)
-!        PRINT *, rank, i, energy_start, energy_end, (energy_end - energy_start)/energy_start
-!        PRINT *, rank, i, (energy_end - energy_start)/energy_start
-        CALL trackDaggerHitTime(states(i, :))
-
-!        CALL fixedEffDaggerHitTime(states(i, :))
-
+        CALL fixedEffDaggerHitTime(states(i, :))
     END DO
-    
+!    
 !    DO i = 0,1000,1
 !        CALL zOffDipCalc(i*1.0_8, z)
 !        PRINT *, i, z
 !    END DO
-    
-!    CALL trackDaggerHitTime(states(ntraj, :))
-    
-!    CALL trackAndPrint(states(ntraj,:))
-
-!    DO i=1,81,1 !Freq
-!        DO j=0,39,1 !Height
-!            maxEgain = 0.0_8
-!            DO k=0,40,1 !Phase
-!                freq = i*2000_8/(80_8)
-!                height = -1.4 + 0.4 * (j/40.0)
-!                sympT = 0.0_8 + (1.0_8/freq) * k / 20.0
-!                CALL testEnergyGain(freq, height, sympT, energy_start, energy_end)
-!                IF ((energy_end - energy_start) > maxEgain) THEN
-!                    maxEgain = (energy_end - energy_start)
-!                END IF
-!!                PRINT *, freq, height, j / 20.0 * 2.0 * PI, energy_start*JTONEV, (energy_end - energy_start)*JTONEV
-!            END DO
-!            PRINT *, freq, height, j / 20.0 * 2.0 * PI, energy_start*JTONEV, maxEgain*JTONEV
-!!            PRINT *, i, j, maxEgain*JTONEV
-!        END DO
-!    END DO
-
-!    CALL trackAndPrint(states(ntraj, :), 0.0_8)
-!    CALL trackDaggerHitTime(states(ntraj, :))
-    
     
     CALL MPI_FINALIZE(ierr)
     
