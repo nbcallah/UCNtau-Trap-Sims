@@ -16,7 +16,7 @@ SUBROUTINE zOffDipCalc(t, z)
     
     integer :: i
     
-    holdT = 1400.0_8
+    holdT = 1400.0_8 
 
     dipHeights = (/0.49_8, 0.49_8, 0.380_8, 0.250_8, 0.010_8/) !3 dip
     dipEnds =     (/0.0_8, holdT, holdT+20.0_8,  holdT+40.0_8,  holdT+140.0_8/) !3 dip
