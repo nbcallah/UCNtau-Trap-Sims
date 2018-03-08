@@ -16,7 +16,7 @@ SUBROUTINE zOffDipCalc(t, z)
     
     integer :: i
     
-    holdT = 0.0_8
+    holdT = 1400.0_8
 
     dipHeights = (/0.49_8, 0.49_8, 0.380_8, 0.250_8, 0.010_8/) !3 dip
     dipEnds =     (/0.0_8, holdT, holdT+20.0_8,  holdT+40.0_8,  holdT+140.0_8/) !3 dip
@@ -167,12 +167,12 @@ SUBROUTINE fixedEffDaggerHitTime(state)
     
     CALL RANDOM_NUMBER(deathTime)
     deathTime = -877.7_8*LOG(deathTime)
-    !IF (deathTime < 1400) THEN
-    !    WRITE(1) energy, theta, 0.0_8, state(5)*state(5)/(2.0_8*MASS_N), &
-    !        state(1), state(2), state(3), -1.0_8, nHit, nHitHouseLow, nHitHouseHigh, &
-    !        (energy-eStart)/eStart, deathTime
-    !    RETURN
-    !END IF
+    IF (deathTime < 1400) THEN
+        WRITE(1) energy, theta, 0.0_8, state(5)*state(5)/(2.0_8*MASS_N), &
+            state(1), state(2), state(3), -1.0_8, nHit, nHitHouseLow, nHitHouseHigh, &
+            (energy-eStart)/eStart, deathTime
+        RETURN
+    END IF
     
     numSteps = settlingTime/dt
     DO i=1,numSteps,1
