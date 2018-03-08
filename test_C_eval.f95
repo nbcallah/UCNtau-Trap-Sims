@@ -77,7 +77,7 @@ PROGRAM track
 !    b(4)=b(2)
 
     CALL RANDOM_SEED(size=seedLen)
-    seedOff = 1
+    seedOff = 0
     IF (seedLen + seedOff > 32) THEN
         PRINT *, "Error! The requested length of seed is too long"
         CALL EXIT(0)
