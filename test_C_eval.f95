@@ -6,12 +6,14 @@ PROGRAM track
     USE testSubroutines
     USE forcesAndPotential
     USE trackGeometry
+    USE lyapunov
 
     IMPLICIT NONE
     real(kind=PREC) :: x, y, z, fx, fy, fz, totalU, energy, sympT
     real(kind=PREC) :: energy_start, energy_end, maxEgain
     real(kind=PREC) :: freq, height
-    real(kind=PREC), allocatable :: states(:,:)
+    real(kind=PREC), allocatable :: states(:,:,:)
+    real(kind=PREC) :: res(17)
     character(len=256) :: arg
     character(len=256) :: fName
     character(len=256) :: rankString
@@ -53,7 +55,7 @@ PROGRAM track
     minU = -2.390245661413933e-26_8 !For lambda = 0.0508, brem=1.4
     minU = -2.390352484438862e-26_8 !For lambda = 0.05114, brem=1.35
     
-    allocate(states(ntraj,6))
+    allocate(states(ntraj,3,6))
         
     PI=4.0e0_8*ATAN(1.0e0_8)
     a(1)=.5153528374311229364e0_8
@@ -107,54 +109,18 @@ PROGRAM track
 !    END DO
         
     DO i=1,ntraj,1
-        CALL randomPointTrap(states(i,1), states(i,2), states(i,3), states(i,4), states(i,5), states(i,6))
-!        CALL randomPointTrapOptimum(states(i,1), states(i,2), states(i,3),&
-!            states(i,4), states(i,5), states(i,6))
+        CALL randomPointTrap(states(i,1,1), states(i,1,2), states(i,1,3),&
+            states(i,1,4), states(i,1,5), states(i,1,6))
+        CALL createInitialTrajectories(states(i,:,:))
     END DO
+    
+    liptime = 5.0
+	nsep = 100
     
     DO i=trajPerWorker*rank+1,trajPerWorker*(rank+1),1
-!        sympT = 0.0_8
-!       CALL trackAndPrint(states(i,:))
-!        CALL trackEnergyGain(states(i,:), energy_start, energy_end, sympT, 30.0_8)
-!        CALL trackEnergyGain(states(i,:), energy_start, energy_end)
-!        PRINT *, rank, i, energy_start, energy_end, (energy_end - energy_start)/energy_start
-!        PRINT *, rank, i, (energy_end - energy_start)/energy_start
-        CALL trackDaggerHitTime(states(i, :))
-
-!        CALL fixedEffDaggerHitTime(states(i, :))
-
+        CALL calcLyapunov(states(i,:,:), res)
+        WRITE(1), res
     END DO
-    
-!    DO i = 0,1000,1
-!        CALL zOffDipCalc(i*1.0_8, z)
-!        PRINT *, i, z
-!    END DO
-    
-!    CALL trackDaggerHitTime(states(ntraj, :))
-    
-!    CALL trackAndPrint(states(ntraj,:))
-
-!    DO i=1,81,1 !Freq
-!        DO j=0,39,1 !Height
-!            maxEgain = 0.0_8
-!            DO k=0,40,1 !Phase
-!                freq = i*2000_8/(80_8)
-!                height = -1.4 + 0.4 * (j/40.0)
-!                sympT = 0.0_8 + (1.0_8/freq) * k / 20.0
-!                CALL testEnergyGain(freq, height, sympT, energy_start, energy_end)
-!                IF ((energy_end - energy_start) > maxEgain) THEN
-!                    maxEgain = (energy_end - energy_start)
-!                END IF
-!!                PRINT *, freq, height, j / 20.0 * 2.0 * PI, energy_start*JTONEV, (energy_end - energy_start)*JTONEV
-!            END DO
-!            PRINT *, freq, height, j / 20.0 * 2.0 * PI, energy_start*JTONEV, maxEgain*JTONEV
-!!            PRINT *, i, j, maxEgain*JTONEV
-!        END DO
-!    END DO
-
-!    CALL trackAndPrint(states(ntraj, :), 0.0_8)
-!    CALL trackDaggerHitTime(states(ntraj, :))
-    
     
     CALL MPI_FINALIZE(ierr)
     
