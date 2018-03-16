@@ -3,6 +3,9 @@
 #define MASS_N 1.674927471e-27_8
 #define GRAV 9.80665e0_8
 
+#define METRIC_SCALE (/0.2e0_8, 0.25e0_8, 1.34e0_8, 1.25e-27_8, 1.25e-27_8, 1.25e-27_8 /)
+#define PSCALE 1.25e-27_8
+
 #define JTONEV 6.2415091e27_8
 
 #define HBAR 1.054571800e-34
