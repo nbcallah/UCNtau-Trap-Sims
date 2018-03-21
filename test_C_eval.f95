@@ -13,7 +13,8 @@ PROGRAM track
     real(kind=PREC) :: energy_start, energy_end, maxEgain
     real(kind=PREC) :: freq, height
     real(kind=PREC), allocatable :: states(:,:,:)
-    real(kind=PREC) :: res(17)
+    real(kind=PREC) :: res_lyap(17)
+    real(kind=PREC) :: res_clean(10)
     character(len=256) :: arg
     character(len=256) :: fName
     character(len=256) :: rankString
@@ -118,8 +119,10 @@ PROGRAM track
 	nsep = 100
     
     DO i=trajPerWorker*rank+1,trajPerWorker*(rank+1),1
-        CALL calcLyapunov(states(i,:,:), res)
-        WRITE(1), res
+!        CALL calcLyapunov(states(i,:,:), res_lyap)
+!        WRITE(1), res_lyap
+        CALL calcCleanTime(states(i,:,:), res_clean)
+        WRITE(1), res_clean
     END DO
     
     CALL MPI_FINALIZE(ierr)
