@@ -96,7 +96,7 @@ SUBROUTINE calcCleanTime(state, results)
     
     t = 0.0_8
     
-    settlingTime = 100.0_8
+    settlingTime = 0.0_8
 	
 	eMax = 0.0_8
     !results: t, x0, y0, z0, px0, py0, pz0, eStart, eEnd, eMax

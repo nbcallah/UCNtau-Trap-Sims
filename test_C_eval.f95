@@ -121,9 +121,11 @@ PROGRAM track
     DO i=trajPerWorker*rank+1,trajPerWorker*(rank+1),1
 !        CALL calcLyapunov(states(i,:,:), res_lyap)
 !        WRITE(1), res_lyap
-        CALL calcCleanTime(states(i,:,:), res_clean)
-        WRITE(1), res_clean
+!        CALL calcCleanTime(states(i,:,:), res_clean)
+!        WRITE(1), res_clean
     END DO
+    
+    CALL trackAndPrint(states(ntraj,1,:))
     
     CALL MPI_FINALIZE(ierr)
     
